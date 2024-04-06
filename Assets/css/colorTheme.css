@@ -1,0 +1,106 @@
+
+
+* {
+    /* box-sizing: border-box; */
+    margin: 0;
+    /* padding: 0; */
+    /* font-family: 'Poppins', sans-serif; */
+}
+
+:root {
+    --body: #e6e6e6;
+    --container: #fff;
+    --today-stats: gba(218, 218, 218, 0.7);
+    --in-active-tab: #f5f5f5;
+    --icon: #434343;
+    --link: #7A6FF9;
+    --font: #3a3a3a;
+    --button: #FECE00;
+    --light-font: #aaaa;
+    --tab-number-background: #e6e6e6;
+    --border: #dadada;
+    --row-color: #f9f9f9;
+    --available: #298D33;
+    --available-background: #B1FDB9;
+    --available_on: #FFA500;
+    --available_on-background: #ffe7bc;
+    --available-locally: #41A5FC;
+    --available-locally-background: #BDE0FE;
+    --not-available: #ff0000;
+    --not-available-background: #ffd1d1;
+    --on-hold: #DCB200;
+    --on-hold-background: #fff4c7;
+    --out-of-service: #2e2e76;
+    --out-of-service-background: #d2d2ff;
+    --pod-attached: #94ff94;
+    --bol-attached: #ffffc4;
+    --shadow: rgba(0, 0, 0, 0.25);
+    --rating-stars: #FFDF00;
+    --route: url(https://img.icons8.com/ios/100/434343/track-order.png);
+    --shipped: url(https://img.icons8.com/ios/96/434343/shipped.png);
+    --issue: url(https://img.icons8.com/ios/96/434343/important-delivery.png);
+    --invoiced: url(https://img.icons8.com/ios/96/434343/invoice.png);
+    --paid: url(https://img.icons8.com/ios/100/434343/receipt-approved.png);
+    --load: url(https://img.icons8.com/ios-glyphs/90/434343/loader.png);
+    --users: url(https://img.icons8.com/ios/100/434343/add-user-male.png);
+    --notification: url(https://img.icons8.com/ios/50/434343/appointment-reminders--v1.png);
+    --truck_hold: url(https://img.icons8.com/ios/50/434343/waiting-room.png);
+    --fleet: url(https://img.icons8.com/ios/100/434343/truck.png);
+    --clients: url(https://img.icons8.com/ios/100/434343/commercial-development-management.png);
+    --call-check: url(https://img.icons8.com/ios/100/3a3a3a/outgoing-call.png);
+    --goal: url(https://img.icons8.com/ios/50/434343/goal.png);
+    --dashboard: url(https://img.icons8.com/ios/50/434343/combo-chart--v1.png);
+    --menu-icon: url(../Assets/Images/lightmenu.png);
+    --Accounting: url(https://img.icons8.com/ios/100/434343/fund-accounting.png);
+    --live-update: url(https://img.icons8.com/ios/100/434343/approve-and-update.png);
+    --admin: url(https://img.icons8.com/dotty/100/434343/admin-settings-male.png);
+    --chat: url(https://img.icons8.com/ios/50/434343/chat-message--v1.png);
+}
+
+body.dark-theme {
+    --body: #3a3a3a;
+    --container: #4f4f4f;
+    --today-stats: rgba(58, 58, 58, 0.7);
+    --in-active-tab: #3f3f3f;
+    --icon: #f3f3f3;
+    --link: #81ff8d;
+    --font: #fff;
+    --button: #FECE00;
+    --light-font: #dadada;
+    --tab-number-background: #e6e6e6;
+    --border: #dadada;
+    --row-color: #545454;
+    --available: #298D33;
+    --available-background: #B1FDB9;
+    --available-locally: #41A5FC;
+    --available-locally-background: #BDE0FE;
+    --not-available: #ff0000;
+    --not-available-background: #ffd1d1;
+    --on-hold: #DCB200;
+    --on-hold-background: #fff4c7;
+    --out-of-service: #2e2e76;
+    --out-of-service-background: #d2d2ff;
+    --pod-attached: #295829;
+    --bol-attached: #7a7a00;
+    --shadow: rgba(8, 8, 8, 0.25);
+    --rating-stars: #FFDF00;
+    --route: url(https://img.icons8.com/ios/100/f3f3f3/track-order.png);
+    --shipped: url(https://img.icons8.com/ios/96/f3f3f3/shipped.png);
+    --issue: url(https://img.icons8.com/ios/96/f3f3f3/important-delivery.png);
+    --invoiced: url(https://img.icons8.com/ios/96/f3f3f3/invoice.png);
+    --paid: url(https://img.icons8.com/ios/100/f3f3f3/receipt-approved.png);
+    --load: url(https://img.icons8.com/ios-glyphs/90/f3f3f3/loader.png);
+    --users: url(https://img.icons8.com/ios/100/f3f3f3/add-user-male.png);
+    --notification: url(https://img.icons8.com/ios/50/f3f3f3/appointment-reminders--v1.png);
+    --truck_hold: url(https://img.icons8.com/ios/50/f3f3f3/waiting-room.png);
+    --fleet: url(https://img.icons8.com/ios/100/f3f3f3/truck.png);
+    --clients: url(https://img.icons8.com/ios/100/f3f3f3/commercial-development-management.png);
+    --goal: url(https://img.icons8.com/ios/50/f3f3f3/goal.png);
+    --call-check: url(https://img.icons8.com/ios/100/f3f3f3/outgoing-call.png);
+    --dashboard: url(https://img.icons8.com/ios/50/f3f3f3/combo-chart--v1.png);
+    --menu-icon: url(../Assets/Images/darkmenu.png);
+    --Accounting: url(https://img.icons8.com/ios/100/f3f3f3/fund-accounting.png);
+    --live-update: url(https://img.icons8.com/ios/100/f3f3f3/approve-and-update.png);
+    --admin: url(https://img.icons8.com/dotty/100/f3f3f3/admin-settings-male.png);
+    --chat: url(https://img.icons8.com/ios/50/f3f3f3/chat-message--v1.png);
+}
