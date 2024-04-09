@@ -11,7 +11,7 @@ require_once 'phpmailer/SMTP.php';
 $Server = 'localhost';
 $userName = 'root';
 $password = '';
-$DB = 'logisticscrm';
+$DB = 'gdpayments';
 date_default_timezone_set('America/New_York');
 
 $mail = new PHPMailer;

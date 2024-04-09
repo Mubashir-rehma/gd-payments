@@ -1064,7 +1064,7 @@ ul.tabs>li:after {
 
 .newloadHeader {
     background-color: var(--button);
-    margin: -20px -20px 57px 4px;
+    margin: -1px 0px 0px 0px;
     padding: 7px;
     text-align: center;
     color: #3a3a3a;
@@ -1159,8 +1159,6 @@ textarea {
 /* Modal Content */
 .modal-content {
     background-color: var(--container);
-    margin: auto !important;
-    padding: 20px;
     border: 1px solid #888;
     width: 71%;
     border-radius: 10px;
@@ -1257,6 +1255,25 @@ textarea {
     /* border-right: 1px solid #dadada; */
     /* padding: 0 15px; */
     margin-top: 20px;
+}
+
+.amountcard {
+    display: flex;
+    justify-content: space-between; /* Adjust alignment as needed */
+}
+
+
+.load_stats:last-child {
+    margin-right: 0; /* Remove margin from the last element to prevent extra space */
+}
+
+.load_stats img {
+    width: 100px; /* Adjust image width as needed */
+    height: auto; /* Maintain aspect ratio */
+}
+
+.load_stats .content {
+    text-align: center;
 }
 
 .User_Files div h2 {
@@ -1836,9 +1853,9 @@ div.alert_msg {
     column-gap: 10px;
     width: 100%;
 }
-.chart{
+/* .chart{
     width: 50%;
-}
+} */
 
 .chart-shadow{
     box-shadow: 0px 4px 10px 3px var(--shadow);
@@ -2314,7 +2331,7 @@ tbody tr:nth-child(even) {
     border-radius: 7px;
     padding: 10px 20px 10px 10px;
     display: flex;
-    width: fit-content;
+    width: 100%;
     margin-left: 25px;
     height: fit-content;
 }
@@ -2390,8 +2407,6 @@ tbody tr:nth-child(even) {
 }
 
 .statusbar_Section {
-    height: 250px;
-    overflow: auto;
     flex: 2;
     width: 80%;
 }
@@ -3054,9 +3069,6 @@ span.close_msg {
     padding: 1px 8px;
     border-radius: 50%;
     cursor: pointer;
-}
-form#driver_info_form {
-    overflow: auto;
 }
 
 
