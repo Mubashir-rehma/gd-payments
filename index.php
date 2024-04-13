@@ -31,11 +31,11 @@ use function GuzzleHttp\Psr7\str;
 
 session_start();
 
-if (!empty($sessData['status']['msg'])) {
-    $statusMsg = $sessData['status']['msg'];
-    $statusMsgType = $sessData['status']['type'];
-    unset($_SESSION['sessData']['status']);
-}
+// if (!empty($sessData['status']['msg'])) {
+//     $statusMsg = $sessData['status']['msg'];
+//     $statusMsgType = $sessData['status']['type'];
+//     unset($_SESSION['sessData']['status']);
+// }
 
 
 
@@ -53,18 +53,17 @@ $matchedstatus = $mysqli->query("SELECT count(Status) FROM gd_pay where Status='
 $matchedstatusData = mysqli_fetch_assoc($matchedstatus);
 $matched = $matchedstatusData['count(Status)'];
 
-$query = "SELECT * FROM gd_pay";
-$result = $mysqli->query($query);
+if (isset($_GET['id'])) {
+    // Retrieve the ID from the URL
+    $loadID = $_GET['id'];
 
-$data = [];
-while ($row = $result->fetch_assoc()) {
-    // print_r($row);
-    $data[] = $row['GD_number'];
+    // Now you can use $loadID in your PHP code
+    echo "The ID is: " . $loadID;
+    $query = "SELECT * FROM gd_pay WHERE id = $loadID";
+    $result = $mysqli->query($query);
+    print_r($result);
 }
 
-json_encode($data);
-
-print_r($data);
 
 ?>
 
@@ -97,20 +96,7 @@ print_r($data);
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.4.0/chart.js"></script>
 
 
-    <div class="dispatchercharts" style="display: none;">
-        <div class="dis-charts summary">
-            <p>Dispatcher Summary</p>
-            <canvas class="dis-chart" id="dis-summary" style="display: block;box-sizing: border-box;height: 150px !important;"></canvas>
-        </div>
-        <div class=" dis-charts detail">
-            <p>Dispatcher Details</p>
-            <canvas class="chart" id="disDetail" style="display: block;box-sizing: border-box;height: 150px !important;"></canvas>
-        </div>
-        <div class="dis-charts" style="width: 200px">
-            <p>Dispatcher Summary</p>
-            <canvas class="chart" id="disp-pie-summary" style="width: 150px !important;"></canvas>
-        </div>
-    </div>
+
 
     <div class="indexstats dispatchercharts">
 
@@ -138,37 +124,39 @@ print_r($data);
                     </div>
 
                     <div class="modal-body">
-                        <form id="driver_info_form" method="POST" enctype="multipart/form-data">
-                            <input type="hidden" name="id" value="<?php echo !empty($truckdetail['truck_id']) ? $truckdetail['truck_id'] : ''; ?>">
+                        <form id="driver_info_form" class="driver_info_form" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="id">
 
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="GDbank">GD Bank Date</label>
-                                        <input type="date" class="form-control" name="gdbank" id="gdbank" placeholder="08/04/2024" value="<?php echo !empty($truckdetail['truckNumber']) ? $truckdetail['truckNumber'] : ''; ?>">
+                                        <input type="date" class="form-control" name="gdbank" id="gdbank" placeholder="08/04/2024"  >
                                     </div>
 
                                     <div class="form-group">
                                         <label for="totalamount">Total Amount</label>
-                                        <input type="text" class="form-control" name="total_amount" id="total_amount" placeholder="4454" value="<?php echo !empty($truckdetail['Vehicle_dims']) ? $truckdetail['Vehicle_dims'] : ''; ?>">
+                                        <input type="text" class="form-control" name="total_amount" id="total_amount" placeholder="4454">
                                     </div>
                                 </div>
 
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="GD#">GD #</label>
-                                        <input type="text" class="form-control" name="gdno" id="gdno" placeholder="123456789" value="<?php echo !empty($truckdetail['engineNumber']) ? $truckdetail['engineNumber'] : ''; ?>">
+                                        <input type="text" class="form-control" name="gdno" id="gdno" placeholder="123456789" 
+                                    >
                                     </div>
 
                                     <div class="form-group">
                                         <label for="amountpaid">Amount Paid</label>
-                                        <input type="text" class="form-control" name="amount_paid" id="amount_paid" placeholder="6700" value="<?php echo !empty($truckdetail['weight']) ? $truckdetail['weight'] : ''; ?>">
+                                        <input type="text" class="form-control" name="amount_paid" id="amount_paid" placeholder="6700">
                                     </div>
                                 </div>
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="truckstatus">Status</label>
                                         <select class="form-control" name="status" id="status">
+
                                             <option value="opening">Opening</option>
                                             <option value="bs_matched">BS Matched</option>
                                             <option value="posted">Posted</option>
@@ -356,6 +344,62 @@ print_r($data);
     <script src="https://cdn.jsdelivr.net/gh/stefanpenner/es6-promise@master/dist/es6-promise.min.js"></script>
     <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch"></script>
     <script>
+        $(document).ready(function() {
+
+            // Have the previously selected tab open
+            var activeTab = sessionStorage.activeTab;
+            $(".tab-content").fadeIn(1000);
+            if (activeTab) {
+                console.log("active tab", activeTab)
+                $('.tab-content ' + activeTab).show().siblings().hide();
+                // also make sure you your active class to the corresponding tab menu here
+                $(".menu li a[href=" + "\"" + activeTab + "\"" + "]").parent().addClass('active').siblings().removeClass('active');
+                $(".menu li a[href=" + "\"" + activeTab + "\"" + "]").children('span').addClass("active_span").parent().parent().siblings().children().children().removeClass('active_span');
+                $(".menu li a[href=" + "\"" + activeTab + "\"" + "]").children('span').children().addClass("active_span").parent().parent().parent().siblings().children().children().children().removeClass('active_span');
+            } else {
+                activeTab = "#Dashboard";
+                $('.tab-content ' + activeTab).show().siblings().hide();
+                // also make sure you your active class to the corresponding tab menu here
+                $(".menu li a[href=" + "\"" + activeTab + "\"" + "]").parent().addClass('active').siblings().removeClass('active');
+                $(".menu li a[href=" + "\"" + activeTab + "\"" + "]").children('span').addClass("active_span").parent().parent().siblings().children().children().removeClass('active_span');
+                $(".menu li a[href=" + "\"" + activeTab + "\"" + "]").children('span').children().addClass("active_span").parent().parent().parent().siblings().children().children().children().removeClass('active_span');
+            }
+
+            // Enable, disable and switch tabs on click
+            $('.navbar .menu li a').on('click', function(e) {
+                var currentAttrValue = $(this).attr('href');
+                console.log("currentAttrValue", currentAttrValue)
+                // Show/Hide Tabs
+                $('.tab-content ' + currentAttrValue).fadeIn(2000).siblings().hide();
+                sessionStorage.activeTab = currentAttrValue;
+
+                // Change/remove current tab to active
+                $(this).parent('li').addClass('active').siblings().removeClass('active');
+                $('.navbar .menu li a span').removeClass('active_span').removeClass('active_span2');
+                $(this).children().addClass('active_span');
+                e.preventDefault();
+            });
+
+        });
+        // $(document).on("submit", "form#driver_info_form", function (e) { // Changed form selector
+        //     e.preventDefault();
+        //     var formData = new FormData(this);
+
+        //     $.ajax({
+        //       url: "./Assets/backendfiles/gd_pay.php?action_type=newgd", // Corrected URL path
+        //       type: "POST",
+        //       data: formData,
+        //       success: function (data) {
+        //         data = JSON.parse(data)[0];
+        //         if (data.success == 1) {
+        //           fetchloadrows(["opening"], ["table1"]);
+        //         }
+        //       },
+        //       cache: false,
+        //       processData: false,
+        //     });
+        //   });
+
         // Search functionality
         function search() {
             var input, filter, ul, li, p, i, txtValue;
@@ -401,7 +445,6 @@ print_r($data);
                     data: formData,
                     success: function(response) {
                         // Handle the response here, if needed
-                        fetchloadrows(["opening", "bs_matched", "posted"], ['table1', 'table3', 'table2'])
                         window.location.href = 'gd_payments.php';
                         // Optionally, you can display a success message or perform other actions
                     },
@@ -416,36 +459,36 @@ print_r($data);
 
         var Data = [];
 
-        function fetchData(callback) {
-            $.ajax({
-                url: './Assets/backendfiles/gd_pay.php',
-                type: 'GET',
-                dataType: 'json',
-                success: function(response) {
+        // function fetchData(callback) {
+        //     $.ajax({
+        //         url: './Assets/backendfiles/gd_pay.php',
+        //         type: 'GET',
+        //         dataType: 'json',
+        //         success: function(response) {
 
-                    return response
-                    // Call the callback function with the response data
-                    callback(response);
-                },
-                error: function(xhr, status, error) {
-                    console.error('Request failed with status ' + status);
-                    // Optionally, call the callback with null or an error message
-                    callback(null);
-                }
-            });
-        }
+        //             return response
+        //             // Call the callback function with the response data
+        //             callback(response);
+        //         },
+        //         error: function(xhr, status, error) {
+        //             console.error('Request failed with status ' + status);
+        //             // Optionally, call the callback with null or an error message
+        //             callback(null);
+        //         }
+        //     });
+        // }
 
-        // Call fetchData with a callback function to handle the response
-        fetchData(function(response) {
-            if (response) {
-                // Handle the response data here
-                Data = response;
-                console.log("Data:", Data);
-            } else {
-                // Handle the case where the request fails or returns empty data
-                console.log("Failed to fetch data.");
-            }
-        });
+        // // Call fetchData with a callback function to handle the response
+        // fetchData(function(response) {
+        //     if (response) {
+        //         // Handle the response data here
+        //         Data = response;
+        //         console.log("Data:", Data);
+        //     } else {
+        //         // Handle the case where the request fails or returns empty data
+        //         console.log("Failed to fetch data.");
+        //     }
+        // });
 
         function filterByGDNumber(data, gdNumber) {
             return data.filter(function(record) {
@@ -534,27 +577,27 @@ print_r($data);
 
         // var countries = ["Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Anguilla", "Antigua &amp; Barbuda", "Argentina", "Armenia", "Aruba", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bermuda", "Bhutan", "Bolivia", "Bosnia &amp; Herzegovina", "Botswana", "Brazil", "British Virgin Islands", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon", "Canada", "Cape Verde", "Cayman Islands", "Central Arfrican Republic", "Chad", "Chile", "China", "Colombia", "Congo", "Cook Islands", "Costa Rica", "Cote D Ivoire", "Croatia", "Cuba", "Curacao", "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Ethiopia", "Falkland Islands", "Faroe Islands", "Fiji", "Finland", "France", "French Polynesia", "French West Indies", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Gibraltar", "Greece", "Greenland", "Grenada", "Guam", "Guatemala", "Guernsey", "Guinea", "Guinea Bissau", "Guyana", "Haiti", "Honduras", "Hong Kong", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Isle of Man", "Israel", "Italy", "Jamaica", "Japan", "Jersey", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kosovo", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Macau", "Macedonia", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Montserrat", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauro", "Nepal", "Netherlands", "Netherlands Antilles", "New Caledonia", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea", "Norway", "Oman", "Pakistan", "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Puerto Rico", "Qatar", "Reunion", "Romania", "Russia", "Rwanda", "Saint Pierre &amp; Miquelon", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "St Kitts &amp; Nevis", "St Lucia", "St Vincent", "Sudan", "Suriname", "Swaziland", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor L'Este", "Togo", "Tonga", "Trinidad &amp; Tobago", "Tunisia", "Turkey", "Turkmenistan", "Turks &amp; Caicos", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States of America", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Virgin Islands (US)", "Yemen", "Zambia", "Zimbabwe"];
 
-        function c() {
-            var d = []
-            $.ajax({
-                url: './Assets/backendfiles/gd_pay.php',
-                type: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    d = response
-                    return response
-                    // Call the callback function with the response data
-                    // callback(response);
-                },
-                error: function(xhr, status, error) {
-                    console.error('Request failed with status ' + status);
-                    // Optionally, call the callback with null or an error message
-                    // callback(null);
-                }
-            });
+        // function c() {
+        //     var d = []
+        //     $.ajax({
+        //         url: './Assets/backendfiles/gd_pay.php',
+        //         type: 'GET',
+        //         dataType: 'json',
+        //         success: function(response) {
+        //             d = response
+        //             return response
+        //             // Call the callback function with the response data
+        //             // callback(response);
+        //         },
+        //         error: function(xhr, status, error) {
+        //             console.error('Request failed with status ' + status);
+        //             // Optionally, call the callback with null or an error message
+        //             // callback(null);
+        //         }
+        //     });
 
-            return d
-        }
+        //     return d
+        // }
 
         var countries = () => {
             $.ajax({
@@ -684,31 +727,6 @@ print_r($data);
         if (co) {
             console.log(co)
             autocomplete(document.getElementById("myInput"), countries);
-        }
-
-
-        function fetchloadrows(query = Array(), tableIds = Array()) {
-            for (i = 0; i < query.length; i++) {
-                console.log("query:", query[i])
-                    (function(i) {
-                        // console.log(query[i])
-                        // setTimeout(function(){
-                        // query = query[i];
-                        $.ajax({
-
-                            url: './Assets/backendfiles/gd_pay.php?' + query[i] + "=1",
-                            methd: "POST",
-                            success: function(data) {
-                                // for(t = 0; t < tableIds.length; t++){
-                                $('#' + tableIds[i]).DataTable().destroy();
-                                $("#" + tableIds[i] + " > tbody").html(data);
-                                $('#' + tableIds[i]).DataTable().draw();
-                                // }
-                            }
-                        })
-                        // }, 1000 * i);
-                    }(i));
-            }
         }
     </script>
 
