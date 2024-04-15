@@ -13,8 +13,10 @@
 
     <script>
         $('a[tab-toggle="tab"]').on('shown.bs.tab', function(e) {
-            localStorage.setItem('activeTab', $(e.target).attr('href'));
+            var activeTab = $(e.target).attr('href');
+            localStorage.setItem('activeTab', activeTab);
         });
+
         var activeTab = localStorage.getItem('activeTab');
         if (activeTab) {
             $('#tabs a[href="' + activeTab + '"]').tab('show');
@@ -30,26 +32,7 @@ include './Assets/js/charts/charts.php';
 use function GuzzleHttp\Psr7\str;
 
 session_start();
-include_once "./Assets/backendfiles/access.php";
-access('ALL');
-// access('ACCOUNTANT');
 
-if (isset($_POST['read'])) {
-    if (!isset($_SESSION['loggedin'])) {
-        header('Location: login.php');
-    } else {
-        if (isset($_POST['read'])) {
-            header('location: index.php');
-            session_destroy();
-        }
-    }
-}
-
-
-
-// $postData = $newloadData = array();
-
-// Get session data 
 $sessData = !empty($_SESSION['sessData']) ? $_SESSION['sessData'] : '';
 
 // Get status message from session 
@@ -69,126 +52,39 @@ if (!empty($sessData['postData'])) {
 
 include './Assets/backendfiles/config.php';
 
-// if (!empty($_GET['id'])) {
-//     $id = $_GET['id'];
-//     $newloaddata = $mysqli->query("SELECT * FROM newload n 
-//     LEFT OUTER JOIN truck_details AS t ON t.truck_id = n.truck_Number 
-//     LEFT OUTER JOIN broker_details AS b ON b.broker_id = n.Broker 
-//     LEFT OUTER JOIN (select *, max(callid) from newcheckcalls 
-//     GROUP BY newloadID) C ON C.newloadID = n.id where n.id = '$id'
-//     ORDER BY id DESC limit 1") or die($mysqli->error);
+// Count for partially paid status
+$partially_paid_query = $mysqli->query("SELECT COUNT(*) AS partially_count
+    FROM gdpays
+    JOIN gd_pay ON gdpays.id = gd_pay.gpid
+    WHERE gdpays.status = 'partially_paid';
+") or die($mysqli->error);
+$partially_paid_data = mysqli_fetch_assoc($partially_paid_query);
+$partially_paid = $partially_paid_data['partially_count'];
 
-//     $newloaddata = mysqli_fetch_assoc($newloaddata);
-// };
+// Count for paid status
+$paid_query = $mysqli->query("SELECT COUNT(*) AS paid_count
+    FROM gdpays
+    JOIN gd_pay ON gdpays.id = gd_pay.gpid
+    WHERE gdpays.status = 'paid';
+") or die($mysqli->error);
+$paid_data = mysqli_fetch_assoc($paid_query);
+$paid = $paid_data['paid_count'];
 
-
-// $address = $mysqli->query("SELECT * FROM address") or die($mysqli->error);
-// $dest = $mysqli->query("SELECT * FROM address") or die($mysqli->error);
-// $truck_details = $mysqli->query("SELECT * FROM truck_details") or die($mysqli->error);
-// $broker_details = $mysqli->query("SELECT * FROM broker_details GROUP BY broker_company") or die($mysqli->error);
-// $users = $mysqli->query("SELECT user_name FROM users") or die($mysqli->error);
-
-// if (!empty($_GET['callid'])) {
-//     $callid = $_GET['callid'];
-//     $checkcalls = $mysqli->query("SELECT * FROM newcheckcalls where callid=$callid") or die($mysqli->error);
-//     $checkcall = mysqli_fetch_assoc($checkcalls);
-// }
-
-
-// // Pre-filled data 
-// $newloadData = !empty($postData) ? $postData : $newloadData;
-
-// // Define action 
-// $actionLabel = !empty($_GET['id']) ? 'Update' : 'Add';
-
-// $load_en_routestatus = $mysqli->query("SELECT count(status) FROM newload where status='load_en_route'") or die($mysqli->error);
-// $load_en_routestatusData = mysqli_fetch_assoc($load_en_routestatus);
-// $load_en_route = $load_en_routestatusData['count(status)'];
-
-// $load_deliveredstatus = $mysqli->query("SELECT count(status) FROM newload where status='load_delivered'") or die($mysqli->error);
-// $load_deliveredstatusData = mysqli_fetch_assoc($load_deliveredstatus);
-// $load_delivered = $load_deliveredstatusData['count(status)'];
-
-// $load_issuestatus = $mysqli->query("SELECT count(status) FROM newload where status='load_issue'") or die($mysqli->error);
-// $load_issuestatusData = mysqli_fetch_assoc($load_issuestatus);
-// $load_issue = $load_issuestatusData['count(status)'];
-
-// $load_invoicedstatus = $mysqli->query("SELECT count(status) FROM newload where status='load_invoiced'") or die($mysqli->error);
-// $load_invoicedstatusData = mysqli_fetch_assoc($load_invoicedstatus);
-// $load_invoiced = $load_invoicedstatusData['count(status)'];
-
-// $load_paidstatus = $mysqli->query("SELECT count(status) FROM newload where status='load_paid'") or die($mysqli->error);
-// $load_paidstatusData = mysqli_fetch_assoc($load_paidstatus);
-// $load_paid = $load_paidstatusData['count(status)'];
-
-// $load_factored = $mysqli->query("SELECT count(status) FROM newload where status='load_Factored'") or die($mysqli->error);
-// $load_factoredData = mysqli_fetch_assoc($load_factored);
-// $load_factored = $load_factoredData['count(status)'];
-
-// // Number of total loads delivered today
-// $today = date('Y-m-d');
-// $loads_delivered_todayQuery = $mysqli->query("SELECT count(status) FROM newload where DATE(delivery_date)='$today'") or die($mysqli->error);
-// $loads_delivered_todayQueryData = mysqli_fetch_assoc($loads_delivered_todayQuery);
-// $loads_delivered_today = $loads_delivered_todayQueryData['count(status)'];
-
-// $disQuery = $mysqli->query("SELECT dispatcher,count(dispatcher)  AS count_me FROM newload WHERE dispatcher IS NOT NULL GROUP BY dispatcher ORDER BY COUNT(dispatcher) DESC") or die($mysqli->error);
-// $disData = mysqli_fetch_array($disQuery);
+// Count for payable status
+$payable_query = $mysqli->query("SELECT COUNT(*) AS payable_count
+    FROM gdpays
+    JOIN gd_pay ON gdpays.id = gd_pay.gpid
+    WHERE gdpays.status = 'Payable';
+") or die($mysqli->error);
+$payable_data = mysqli_fetch_assoc($payable_query);
+$payable = $payable_data['payable_count'];
 
 
-// $status_bar_query = "select * from newload as n 
-// left outer join 
-// (select * from load_tracking T where exists (select * from (select load_id, max(tracking_id) as tracking_id
-//     from load_tracking tt 
-//     group by Load_pickup_location, load_Destination
-//     ) as tt where T.tracking_id = tt.tracking_id)) T 
-//     on n.id = T.load_id 
-// LEFT OUTER JOIN truck_details AS t 
-//     ON t.truck_id = n.truck_Number 
-// LEFT OUTER JOIN broker_details AS b 
-//     ON b.broker_id = n.Broker 
-// LEFT OUTER JOIN 
-//     (select * from newcheckcalls C where exists (select * from (select newloadID, max(callid) as callid
-//     from newcheckcalls cc 
-//     GROUP BY newloadID
-//     ) as cc where C.callid = cc.callid)) C on n.id = C.newloadID 
-// where n.status = 'load_en_route'
-// order by n.id desc";
-// $status_bar = $mysqli->query($status_bar_query) or die($mysqli->error);
-// foreach($status_bar as $row){
-//     print("  lID:   ". $row['id'] . "  TID:  " . $row['tracking_id'] . "  LPU:  " . $row['Pick_up_Location'] . "  TPU:   " . $row['Load_pickup_location'] . "  LDES:  " . $row['Destination'] . "   TDES:  " .$row['load_Destination'] . "  Ttotal DIS:   " . $row['total_distance'] . "  TC DIS:   " .$row['current_distace'] . "<br>");
-// };
+$query = 'SELECT SUM(TotalAmount) AS total_amount FROM gd_pay';
+$result = $mysqli->query($query);
 
-// function loadstatusbars($mysqli)
-// {
-//     $query = "select * from newload where status <> 'load_delivered' order by id desc";
-//     $data = $mysqli->query($query) or die($mysqli->error);
-
-//     foreach ($data as $row) {
-//         $PU = unserialize($row['Pick_up_Location']);
-//         $des = unserialize($row['Destination']);
-//         $dis = unserialize($row['distance']);
-//         $time = unserialize($row['time']);
-//         $id = $row['id'];
-
-//         $count = count(is_countable($PU) ? $PU : []);
-
-//         print("count:   " .  $count  . "  /PU:  " . $row['Pick_up_Location'] . "  /des:  " . $row['Destination'] . "   /dis:  " . $row['distance'] . "  /time:  " . $row['time'] . "<br>");
-
-//         for ($i = 0; $i < $count; $i++) {
-//             $PU = $PU[$i];
-//             $des = $des[$i];
-//             $dis = $dis[$i];
-//             $time = $time[$i];
-
-//             $tquery = "select * from load_tracking where load_id='$id' and load_Destination='$des' and Load_pickup_location='$PU' order by tracking_id desc limit 1";
-//             $tdata = $mysqli->query($tquery) or die($mysqli->error);
-
-//             foreach ($tdata as $t) {
-//                 // print("  lID:   " . $id . "  TID:  " . $t['tracking_id'] . "  LPU:  " . $PU . "  TPU:   " . $t['Load_pickup_location'] . "  LDES:  " . $des . "   TDES:  " . $t['load_Destination'] . "  Ttotal DIS:   " . $dis . "  TC DIS:   " . $t['current_distace'] . "   T CL:  " . $t['current_location'] . "<br>");
-//             }
-//         };
-//     };
-// }
+$query1 = 'SELECT SUM(total_paid) AS total_paid FROM gdpays';
+$result1 = $mysqli->query($query1);
 
 
 
@@ -276,13 +172,19 @@ function floatvalue($val)
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <p class="form-control-static">GD #: <?php echo !empty($static_values['gd']) ? $static_values['gd'] : '77'; ?></p>
+                                        <p class="form-control-static">GD #:
+                                            <?php echo !empty($static_values['gd']) ? $static_values['gd'] : '77'; ?>
+                                        </p>
                                     </div>
                                     <div class="form-group">
-                                        <p class="form-control-static">Total Amount: <?php echo !empty($static_values['total_amount']) ? $static_values['total_amount'] : '7000'; ?></p>
+                                        <p class="form-control-static">Total Amount:
+                                            <?php echo !empty($static_values['total_amount']) ? $static_values['total_amount'] : '7000'; ?>
+                                        </p>
                                     </div>
                                     <div class="form-group">
-                                        <p class="form-control-static">Status: <?php echo !empty($static_values['status']) ? $static_values['status'] : 'Opened'; ?></p>
+                                        <p class="form-control-static">Status:
+                                            <?php echo !empty($static_values['status']) ? $static_values['status'] : 'Opened'; ?>
+                                        </p>
                                     </div>
                                 </div>
 
@@ -300,15 +202,11 @@ function floatvalue($val)
 
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <label for="truckstatus">Status</label>
-                                        <select class="form-control" name="truckstatus" id="truckstatus">
-                                            <option value="available">Available</option>
-                                            <option value="available_locally">Available Locally</option>
-                                            <option value="not_Available">Not Available</option>
-                                            <option value="out_Of_service">Out Of service</option>
-                                            <option value="available_on_">Available on_</option>
-                                            <option value="on_Hold">On Hold</option>
-                                            <option value="dedicated">Dedicated</option>
+                                        <label for="gdstatus">Status</label>
+                                        <select class="form-control" name="gdpstatus" id="gdsstatus">
+                                            <option value="partially_paid">Partailly Paid</option>
+                                            <option value="Paid">Paid</option>
+                                            <option value="Payable">Payable</option>
                                         </select>
                                     </div>
                                 </div>
@@ -317,7 +215,6 @@ function floatvalue($val)
 
                             <div class="formbuttons">
                                 <button type="reset" value="Cancel" name="reset" class="cancel">Reset</button>
-                                <button type="submit" value="Submit" name="payment" class="submit">+ Payment</button>
                                 <button type="submit" value="Submit" name="truckstate" class="submit">Submit</button>
 
                             </div>
@@ -334,14 +231,22 @@ function floatvalue($val)
                 <div class="load_stats">
                     <div class="content" style="text-align: center;">
                         <p>Total Amount</p>
-                        <h2 style="color:green"><?php echo '0'?></h2>
+                        <h2 style="color:green"><?php if ($result) {
+                                                    $row = $result->fetch_assoc();
+                                                    $total_amount = $row['total_amount'];
+                                                    echo "$ $total_amount"; // Output the total amount
+                                                } ?></h2>
                     </div>
                 </div>
                 <div class="load_stats">
 
                     <div class="content" style="text-align: center;">
                         <p>Total Paid</p>
-                        <h2 style="color:red"><?php echo '0' ?></h2>
+                        <h2 style="color:red"><?php if ($result1) {
+                                                    $row1 = $result1->fetch_assoc();
+                                                    $total_paid = $row1['total_paid'];
+                                                    echo "$ $total_paid"; // Output the total amount
+                                                } ?></h2>
                     </div>
                 </div>
             </div>
@@ -370,27 +275,27 @@ function floatvalue($val)
         <ul class="menu tabs" style="padding: 0;">
             <li class="nav-item">
                 <img id="issue" src="" alt="" srcset="">
-                <a href="#load_issue" class="nav-link" class="nav-link"><span class="title">Posted</span>
+                <a href="#Paid" class="nav-link" class="nav-link"><span class="title">Paid</span>
                     <span>
-                        <?php echo '0'  ?>
+                        <?php echo $paid ?>
                     </span>
                 </a>
 
             </li>
             <li class="nav-item">
                 <img id="shipped" src="" alt="" srcset="">
-                <a href="#load_delivered" class="nav-link" class="nav-link"><span class="title"> BS Matched</span>
+                <a href="#partially_paid" class="nav-link" class="nav-link"><span class="title">Partially Paid</span>
                     <span>
-                        <?php echo '0'  ?>
+                        <?php echo $partially_paid ?>
                     </span>
                 </a>
 
             </li>
             <li class="nav-item">
                 <img id="route" src="" alt="">
-                <a href="#load_en_route" class="nav-link" class="nav-link"><span class="title">Opening</span>
+                <a href="#Payable" class="nav-link" class="nav-link"><span class="title">Payable</span>
                     <span>
-                        <?php echo '0' ?>
+                        <?php echo $payable ?>
                     </span>
                 </a>
 
@@ -408,8 +313,8 @@ function floatvalue($val)
     <div class=outer-circle></div>
 
     <div class="tab-content">
-        <div class="table tabcontent active" id="load_en_route" style=" display: block;">
-            <table id="table1" style="width: 100%;">
+        <div class="table tabcontent active" id="payable" style=" display: block;">
+            <table id="table4" style="width: 100%;">
                 <thead>
                     <tr style="background: none; text-align: center;width: 100%;">
                         <th>#</th>
@@ -434,8 +339,8 @@ function floatvalue($val)
             </table>
         </div>
 
-        <div class="table tabcontent" id="load_delivered">
-            <table id="table2" style="width: 100%;">
+        <div class="table tabcontent" id="partially_paid">
+            <table id="table5" style="width: 100%;">
                 <thead>
                     <tr style="background: none; text-align: center;width: 100%;">
                         <th>#</th>
@@ -458,8 +363,8 @@ function floatvalue($val)
             </table>
         </div>
 
-        <div class="table tabcontent" id="load_issue">
-            <table id="table3" style="width: 100%;">
+        <div class="table tabcontent" id="paid">
+            <table id="table6" style="width: 100%;">
                 <thead>
                     <tr style="background: none; text-align: center;width: 100%;">
                         <th>#</th>
@@ -497,7 +402,132 @@ function floatvalue($val)
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ol3/3.10.1/ol.min.css">
     <script src="https://cdn.jsdelivr.net/gh/stefanpenner/es6-promise@master/dist/es6-promise.min.js"></script>
     <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script>
+        $(document).ready(function() {
+            // Have the previously selected tab open
+            var activeTab = sessionStorage.activeTab;
+          
+            $(".tab-content").fadeIn(1000);
+            if (activeTab) {
+                $('.tab-content ' + activeTab).show().siblings().hide();
+                // also make sure you your active class to the corresponding tab menu here
+                $(".menu li a[href=" + "\"" + activeTab + "\"" + "]").parent().addClass('active').siblings().removeClass('active');
+                $(".menu li a[href=" + "\"" + activeTab + "\"" + "]").children('span').addClass("active_span").parent().parent().siblings().children().children().removeClass('active_span');
+                $(".menu li a[href=" + "\"" + activeTab + "\"" + "]").children('span').children().addClass("active_span").parent().parent().parent().siblings().children().children().children().removeClass('active_span');
+            } else {
+                activeTab = "#Dashboard";
+                $('.tab-content ' + activeTab).show().siblings().hide();
+                // also make sure you your active class to the corresponding tab menu here
+                $(".menu li a[href=" + "\"" + activeTab + "\"" + "]").parent().addClass('active').siblings().removeClass('active');
+                $(".menu li a[href=" + "\"" + activeTab + "\"" + "]").children('span').addClass("active_span").parent().parent().siblings().children().children().removeClass('active_span');
+                $(".menu li a[href=" + "\"" + activeTab + "\"" + "]").children('span').children().addClass("active_span").parent().parent().parent().siblings().children().children().children().removeClass('active_span');
+            }
+
+            // Enable, disable and switch tabs on click
+            $('.navbar .menu li a').on('click', function(e) {
+                var currentAttrValue = $(this).attr('href');
+                console.log("currentAttrValue", currentAttrValue)
+                // Show/Hide Tabs
+                $('.tab-content ' + currentAttrValue).fadeIn(2000).siblings().hide();
+                sessionStorage.activeTab = currentAttrValue;
+
+                // Change/remove current tab to active
+                $(this).parent('li').addClass('active').siblings().removeClass('active');
+                $('.navbar .menu li a span').removeClass('active_span').removeClass('active_span2');
+                $(this).children().addClass('active_span');
+                e.preventDefault();
+            });
+
+        });
+        // var dispSummaryelement = document.getElementById("dis-summary")
+        //         // disSummary.defaults.font.size = 8;
+        //         var disSummary = new Chart(dispSummaryelement, config);
+
+        var config3 = {
+            type: 'doughnut',
+            data: {
+                labels: ['No label'
+                    // <?php
+                        // $labels = $mysqli->query("SELECT SUM(TotalAmount) AS total_amount FROM gd_pay") or die($mysqli->error);
+                        // while ($row = mysqli_fetch_array($labels)) {
+                        //     echo "'" . $row['TotalAmount'] . "', ";
+                        //     $dispatcher = $row['TotalAmount'];
+                        // }
+                        // 
+                        ?>
+                ],
+                datasets: [{
+                    data: [88, 5
+                        // <?php
+
+                            // $data = $mysqli->query("SELECT SUM(TotalAmount) AS total_amount FROM gd_pay") or die($mysqli->error);
+                            // while ($row = mysqli_fetch_array($data)) {
+                            //     echo $row['total_amount'] . ",";
+                            // }
+
+                            // 
+                            ?>
+                    ],
+                    backgroundColor: [
+                        "#F94144",
+                        "#F3722C",
+                    ],
+                    borderWidth: 0.5,
+
+                }]
+            },
+            options: {
+                responsive: false,
+                plugins: {
+                    legend: {
+                        display: false,
+                        labels: {
+
+                            // This more specific font property overrides the global property
+                            font: {
+                                size: 8,
+
+                            }
+                        }
+                    }
+                },
+                // legend: {
+                //     display: false
+                // },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false,
+                        },
+                        ticks: {
+                            color: "#aaaa",
+                            font: {
+                                size: 8
+                            }
+                        },
+                        display: false,
+                    },
+                    y: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: "#aaaa",
+                            font: {
+                                size: 8
+                            }
+                        },
+                        display: false,
+                    },
+                }
+            }
+        };
+        var dispPieSummaryelement = document.getElementById("today-goal-left")
+        // disSummary.defaults.font.size = 8;
+        var disPieSummary = new Chart(dispPieSummaryelement, config3);
+
         // Search functionality
         function search() {
             // Declare variables

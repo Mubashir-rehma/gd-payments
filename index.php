@@ -31,14 +31,6 @@ use function GuzzleHttp\Psr7\str;
 
 session_start();
 
-// if (!empty($sessData['status']['msg'])) {
-//     $statusMsg = $sessData['status']['msg'];
-//     $statusMsgType = $sessData['status']['type'];
-//     unset($_SESSION['sessData']['status']);
-// }
-
-
-
 include './Assets/backendfiles/config.php';
 
 $openstatus = $mysqli->query("SELECT count(Status) FROM gd_pay where Status='opening'") or die($mysqli->error);
@@ -63,8 +55,10 @@ if (isset($_GET['id'])) {
     $result = $mysqli->query($query);
     print_r($result);
 }
-
-
+$query = 'SELECT SUM(TotalAmount) AS total_amount FROM gd_pay';
+$result = $mysqli->query($query);
+$query1 = 'SELECT SUM(total_paid) AS total_paid FROM gdpays';
+$result1 = $mysqli->query($query1);
 ?>
 
 
@@ -131,7 +125,7 @@ if (isset($_GET['id'])) {
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="GDbank">GD Bank Date</label>
-                                        <input type="date" class="form-control" name="gdbank" id="gdbank" placeholder="08/04/2024"  >
+                                        <input type="date" class="form-control" name="gdbank" id="gdbank" placeholder="08/04/2024">
                                     </div>
 
                                     <div class="form-group">
@@ -143,8 +137,7 @@ if (isset($_GET['id'])) {
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="GD#">GD #</label>
-                                        <input type="text" class="form-control" name="gdno" id="gdno" placeholder="123456789" 
-                                    >
+                                        <input type="text" class="form-control" name="gdno" id="gdno" placeholder="123456789">
                                     </div>
 
                                     <div class="form-group">
@@ -184,14 +177,22 @@ if (isset($_GET['id'])) {
                 <div class="load_stats">
                     <div class="content" style="text-align: center;">
                         <p>Total Amount</p>
-                        <h2 style="color:green"><?php echo '0' ?></h2>
+                        <h2 style="color:green"><?php if ($result) {
+                                                    $row = $result->fetch_assoc();
+                                                    $total_amount = $row['total_amount'];
+                                                    echo "$ $total_amount"; // Output the total amount
+                                                } ?></h2>
                     </div>
                 </div>
                 <div class="load_stats">
 
                     <div class="content" style="text-align: center;">
                         <p>Total Paid</p>
-                        <h2 style="color:red"><?php echo '0' ?></h2>
+                        <h2 style="color:red"><?php if ($result1) {
+                                                    $row1 = $result1->fetch_assoc();
+                                                    $total_paid = $row1['total_paid'];
+                                                    echo "$ $total_paid"; // Output the total amount
+                                                } ?></h2>
                     </div>
                 </div>
             </div>
@@ -210,11 +211,11 @@ if (isset($_GET['id'])) {
     </div>
 
     <!-- Display status message -->
-    <?php if (!empty($statusMsg)) { ?>
+    <!-- <?php if (!empty($statusMsg)) { ?>
         <div class="col-xs-12" id="alert">
             <div class="alert alert-. $statusMsgType; ?>"><?php echo $statusMsg; ?></div>
         </div>
-    <?php } ?>
+    <?php } ?> -->
 
     <div class="navbar tab-container">
         <ul class="menu tabs" style="padding: 0;">
@@ -222,7 +223,7 @@ if (isset($_GET['id'])) {
                 <img id="issue" src="" alt="" srcset="">
                 <a href="#posted" class="nav-link" class="nav-link"><span class="title">Posted</span>
                     <span>
-                        <?php echo $posted  ?>
+                        <?php echo $posted ?>
                     </span>
                 </a>
 
@@ -231,7 +232,7 @@ if (isset($_GET['id'])) {
                 <img id="shipped" src="" alt="" srcset="">
                 <a href="#bs_matched" class="nav-link" class="nav-link"><span class="title"> BS Matched</span>
                     <span>
-                        <?php echo $matched  ?>
+                        <?php echo $matched ?>
                     </span>
                 </a>
 
@@ -345,9 +346,9 @@ if (isset($_GET['id'])) {
     <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch"></script>
     <script>
         $(document).ready(function() {
-
             // Have the previously selected tab open
             var activeTab = sessionStorage.activeTab;
+            console.log("activeTab", activeTab)
             $(".tab-content").fadeIn(1000);
             if (activeTab) {
                 console.log("active tab", activeTab)
@@ -381,24 +382,7 @@ if (isset($_GET['id'])) {
             });
 
         });
-        // $(document).on("submit", "form#driver_info_form", function (e) { // Changed form selector
-        //     e.preventDefault();
-        //     var formData = new FormData(this);
 
-        //     $.ajax({
-        //       url: "./Assets/backendfiles/gd_pay.php?action_type=newgd", // Corrected URL path
-        //       type: "POST",
-        //       data: formData,
-        //       success: function (data) {
-        //         data = JSON.parse(data)[0];
-        //         if (data.success == 1) {
-        //           fetchloadrows(["opening"], ["table1"]);
-        //         }
-        //       },
-        //       cache: false,
-        //       processData: false,
-        //     });
-        //   });
 
         // Search functionality
         function search() {
@@ -430,65 +414,8 @@ if (isset($_GET['id'])) {
 
 
 
-        $(document).ready(function() {
-            $('#driver_info_form').submit(function(event) {
-                // Prevent the default form submission
-                event.preventDefault();
-
-                // Serialize the form data
-                var formData = $(this).serialize();
-
-                // Send the form data via AJAX
-                $.ajax({
-                    type: 'POST',
-                    url: './Assets/backendfiles/gd_pay.php', // Replace 'your_php_script.php' with the path to your PHP script
-                    data: formData,
-                    success: function(response) {
-                        // Handle the response here, if needed
-                        window.location.href = 'gd_payments.php';
-                        // Optionally, you can display a success message or perform other actions
-                    },
-                    error: function(xhr, status, error) {
-                        // Handle errors here, if any
-                        console.error(xhr.responseText); // Log the error message to the console
-                        // Optionally, you can display an error message or perform other actions
-                    }
-                });
-            });
-        });
 
         var Data = [];
-
-        // function fetchData(callback) {
-        //     $.ajax({
-        //         url: './Assets/backendfiles/gd_pay.php',
-        //         type: 'GET',
-        //         dataType: 'json',
-        //         success: function(response) {
-
-        //             return response
-        //             // Call the callback function with the response data
-        //             callback(response);
-        //         },
-        //         error: function(xhr, status, error) {
-        //             console.error('Request failed with status ' + status);
-        //             // Optionally, call the callback with null or an error message
-        //             callback(null);
-        //         }
-        //     });
-        // }
-
-        // // Call fetchData with a callback function to handle the response
-        // fetchData(function(response) {
-        //     if (response) {
-        //         // Handle the response data here
-        //         Data = response;
-        //         console.log("Data:", Data);
-        //     } else {
-        //         // Handle the case where the request fails or returns empty data
-        //         console.log("Failed to fetch data.");
-        //     }
-        // });
 
         function filterByGDNumber(data, gdNumber) {
             return data.filter(function(record) {

@@ -51,56 +51,25 @@ foreach ($query as $row) {
         <td> <?php echo $status ?></td>
         <td style="display: flex; justify-content: center;">
 
-<!-- <li>
-    <div style="margin: 10px 15px 0px" onclick="newcheckcallsbtn()">
+            <div class="btn-group btn-group-rounded">
+                <button type="button" class="btn btn-default btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="border-radius:3px; background: none; border: none; outline: none; text-align:center;">
+                    <i class="uil uil-ellipsis-h"></i>
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a style="color: green; font-size: 15px; margin: 7px 10px 10px 0; cursor: pointer;" class="driver_info_form" data-action_type="edit_gd" data-load_id="<?php echo $row['id'] ?>">
+                            <i class="uil uil-pen"></i>Edit
+                        </a>
+                    </li>
+                    <li>
+                        <a style="font-size: 15px; margin: 7px 10px 7px 0; cursor: pointer; color: var(--font); " class="load_action" data-action_type="delete" data-load_id="<?php echo $row['id'] ?>">
+                            <i class="fa-solid fa-route"></i> Delete
+                        </a>
+                    </li>
 
-        <a style="color: var(--font); font-size: 15px; margin: 7px 10px 10px 0; cursor: pointer; " href="index.php?action_type=newcall&id=<?php echo $row['id'] ?>">
-            <img class="checkcall" src="" width="15px" height="15px" />
-        </a>
-    </div>
-
-</li> -->
-
-<div class="btn-group btn-group-rounded">
-    <button type="button" class="btn btn-default btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="border-radius:3px; background: none; border: none; outline: none; text-align:center;">
-        <i class="uil uil-ellipsis-h"></i>
-    </button>
-    <ul class="dropdown-menu">
-        <li>
-            <a style="color: green; font-size: 15px; margin: 7px 10px 10px 0; cursor: pointer;" class="driver_info_form" data-action_type="edit_gd" data-load_id="<?php echo $row['id'] ?>">
-                <i class="uil uil-pen"></i>Edit
-            </a>
-        </li>
-
-
-        <li>
-            <a style="font-size: 15px; margin: 7px 10px 7px 0; cursor: pointer; color: var(--font); " class="load_action" data-action_type="posted" data-load_id="<?php echo $row['id'] ?>">
-                <i class="fa-solid fa-route"></i> Posted
-            </a>
-        </li>
-
-        
-
-        <li>
-            <a style="font-size: 15px; margin: 7px 10px 7px 0; cursor: pointer; color: var(--font); " class="load_action" data-action_type="opening" data-load_id="<?php echo $row['id'] ?>">
-                <i class="fa-solid fa-route"></i> Opening
-            </a>
-        </li>
-
-        <li>
-            <a style="font-size: 15px; margin: 7px 10px 7px 0; cursor: pointer; color: var(--font);" class="load_action" data-action_type="bs_matched" data-load_id="<?php echo $row['id'] ?>">
-                <i class="fa-solid fa-truck-ramp-box"></i> BS Matched
-            </a>
-        </li>
-
-  
-
-
-
-
-    </ul>
-</div>
-</td>
+                </ul>
+            </div>
+        </td>
 
     </tr>
 

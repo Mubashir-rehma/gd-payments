@@ -1030,7 +1030,7 @@ $(
 ).on("click", ".load_action", function (e) {
   var loadID = $(this).data("load_id");
   var action_type = $(this).data("action_type");
-
+    console.log("loadID:", loadID)
   if (action_type == "delete") {
     var confirmed = confirm("Are you sure you want to delete!");
   } else {
@@ -1038,7 +1038,7 @@ $(
   }
 
   if (confirmed) {
-    $(".loader")[1].style.display = "flex";
+    // $(".loader")[1].style.display = "flex";
     $.ajax({
       type: "POST",
       url:
@@ -1049,6 +1049,7 @@ $(
       data: loadID,
       success: function (data) {
         data = JSON.parse(data)[0];
+        console.log("data", data)
         if (data.success == "1") {
           setTimeout(function () {
             $("#alert_msg").css({
@@ -1062,6 +1063,11 @@ $(
               ["table1", "table2", "table3"]
             );
 
+            fetchgdrows(
+              ["Payable", "partially_paid", "Paid"],
+              ["table4", "table5", "table6"]
+            );
+
             $(".loader")[1].style.display = "none";
             $("#alert_msg").delay(30000).hide(500);
           }, 1000);
@@ -1069,7 +1075,7 @@ $(
           $("#alert_msg").css({ display: "block", backgroundColor: "#ce6c6c" });
           $("#alert_msg").delay(30000).hide(500);
           $("#alert_msg").html(data.msg);
-          $(".loader")[1].style.display = "none";
+          // $(".loader")[1].style.display = "none";
         }
       },
     });
@@ -1077,21 +1083,22 @@ $(
 });
 
 // Get Edit load Form
-$("#loadBoard1, #loadBoard2, #loadBoard3").on("click", ".driver_info_form", function (e) {
+$("#loadBoard1, #loadBoard2, #loadBoard3").on(
+  "click",
+  ".driver_info_form",
+  function (e) {
     var loadID = $(this).data("load_id");
     var url = "./index.php?id=" + loadID;
     $.ajax({
-        type: "POST",
-        url: url,
-        success: function (data) {
-            console.log("loadID", loadID);
-            // You can perform other actions with the data here if needed
-        },
+      type: "POST",
+      url: url,
+      success: function (data) {
+        console.log("loadID", loadID);
+        // You can perform other actions with the data here if needed
+      },
     });
-});
-
-
-  
+  }
+);
 
 $("body").on("click", ".load_edit_close", function (e) {
   // console.log($(".newloadedit_modal")[0])
@@ -1116,6 +1123,38 @@ $("body").on("click", ".load_dispatcher_form", function (e) {
 $("body").on("click", ".close_dispatcher.close", function (e) {
   $(this).parent().parent().remove();
 });
+
+$(document).on("submit", "form#driver_info_form", function (e) {
+  // Prevent the default form submission
+  e.preventDefault();
+
+  // Serialize the form data
+  var formData = $(this).serialize();
+
+  // Send the form data via AJAX
+  $.ajax({
+    type: "POST",
+    url: "./Assets/backendfiles/gd_pay.php", // Replace 'your_php_script.php' with the path to your PHP script
+    data: formData,
+    success: function (response) {
+    
+      fetchloadrows(
+        ["opening", "posted", "bs_matched"],
+        ["table1", "table2", "table3"]
+      );
+      $("form#driver_info_form")[0].reset();
+      // Handle the response here, if needed
+      // window.location.href = 'gd_payments.php';
+      // Optionally, you can display a success message or perform other actions
+    },
+    error: function (xhr, status, error) {
+      // Handle errors here, if any
+      console.error(xhr.responseText); // Log the error message to the console
+      // Optionally, you can display an error message or perform other actions
+    },
+  });
+});
+// });
 
 // Add multiple inputs dynamically
 $(document).ready(function () {
@@ -1147,6 +1186,10 @@ $(document).ready(function () {
     ["table1", "table2", "table3"]
   );
 
+  fetchgdrows(
+    ["Payable", "partially_paid", "Paid"],
+    ["table4", "table5", "table6"]
+  );
   //Once add button is clicked
   $("body").on("click", ".add_button", function (e) {
     //Check maximum number of input fields
@@ -1229,14 +1272,33 @@ $(document).ready(function () {
   });
 });
 
-console.log("fetchloadrows");
-
 function fetchloadrows(query = [], tableIds = []) {
   for (var i = 0; i < query.length; i++) {
     (function (i) {
       console.log("query", query[i]);
       $.ajax({
         url: "./components/load_data.php?" + query[i] + "=1",
+        method: "POST", // Corrected typo here
+        success: function (data) {
+          $("#" + tableIds[i])
+            .DataTable()
+            .destroy();
+          $("#" + tableIds[i] + " > tbody").html(data);
+          $("#" + tableIds[i])
+            .DataTable()
+            .draw();
+        },
+      });
+    })(i);
+  }
+}
+
+function fetchgdrows(query = [], tableIds = []) {
+  for (var i = 0; i < query.length; i++) {
+    (function (i) {
+      console.log("query", query[i]);
+      $.ajax({
+        url: "./components/gd_data.php?" + query[i] + "=1",
         method: "POST", // Corrected typo here
         success: function (data) {
           $("#" + tableIds[i])
