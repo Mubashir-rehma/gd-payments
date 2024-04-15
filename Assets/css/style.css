@@ -24,7 +24,12 @@
     background: #e5e2e3!important;
     border-radius: 0!important;
 } */
-
+* {
+    /* box-sizing: border-box; */
+    margin: 0;
+    /* padding: 0; */
+    font-family: 'Poppins', sans-serif;
+}
 
 .ui-datepicker table tbody .ui-datepicker-week-col {
     cursor: pointer;
@@ -1795,7 +1800,7 @@ div.alert_msg {
     margin-right: 20px;
     margin-bottom: 20px;
     display: none;
-    width: fit-content;
+    width: 'fit-content';
     POSITION: fixed;
     z-index: 1000;
     right: 2%;
@@ -2068,7 +2073,7 @@ td:first-child {
     top: 5px;
     left: 55px;
     width: 100%;
-    backdrop-filter: blur(40px);
+    backdrop-filter: 'blur(40px)';
 }
 
 .chart_button{
@@ -2273,7 +2278,7 @@ td {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: fit-content;
+    width: 'fit-content';
     gap: 5px;
 }
 
@@ -2899,7 +2904,7 @@ p.checknotes.sa {
 }
 
 .accounting.tab {
-    max-height: fit-content;
+    max-height: 'fit-content';
     overflow-y: inherit;
 }
 
@@ -3043,7 +3048,7 @@ div#alert_msgs {
     margin-right: 20px;
     margin-bottom: 20px;
     display: block;
-    width: fit-content;
+    width: 'fit-content';
     POSITION: fixed;
     z-index: 1000;
     right: 2%;
@@ -3057,7 +3062,7 @@ div#alert_msgs {
     margin-right: 20px;
     margin-bottom: 20px;
     display: block;
-    width: fit-content;
+    width: 'fit-content';
     position: initial;
     background-color: green;
 }
@@ -3340,7 +3345,7 @@ p {display:inline-block}
         position: relative;
         /* max-width: 200px; */
         border-radius: 7px;
-        width: fit-content;
+        width: 'fit-content';
     }
     ul.tabs{
         margin: 0;
@@ -3453,7 +3458,7 @@ p {display:inline-block}
         justify-content: space-between;
         width: 90.5%;
         height: auto;
-        max-height: fit-content;
+        max-height: 'fit-content';
         gap: 20px;
     }
 
