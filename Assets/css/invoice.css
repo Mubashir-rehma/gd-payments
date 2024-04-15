@@ -1,0 +1,197 @@
+.invoice{
+    max-width: 94%;
+    padding-top: 70px;
+    margin-left: 30px;
+}
+.invoice p{
+    color: #777676;
+}
+
+.invoice h3, h4{
+    color: #FECE00;
+    font-weight: 600;
+}
+.invoice input{
+    background-color: transparent;
+    border: none;
+    width: auto;
+    max-width: 80px;
+    padding-right: 0;
+    line-height: 1;
+}
+.invoice .flex{
+    display: flex;
+    gap: 120px;
+    margin-bottom: 50px;
+    justify-content: space-between;
+}
+.invoice .header{
+    display: flex;
+    gap: 120px;
+    align-items: center; 
+}
+
+.invoice .header h1{
+    font-size: 50px;
+    color: #A9A3A3;
+}
+
+.invoice table{
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.bold{
+    font-weight: 600;
+}
+
+.invoice tbody tr:nth-child(even) {
+    background-color: transparent;
+}
+
+.items{
+    margin-bottom: 50px;
+    box-shadow: 0px 1px 15px 0px rgba(0, 0, 0, 0.25);
+}
+
+.items thead tr{
+    background-color: #000;
+    text-align: center;
+    color: #fff;
+    padding: 5px;
+}
+
+.items thead tr td{
+    padding: 5px 7px;
+}
+
+.items tr{
+    text-align: center;
+    border-top: 1px solid #dadada;
+}
+
+.totals tr, .inv_detail tr{
+    line-height: 0.5;
+}
+
+.duedate, .duedate input{
+    display: flex;
+    text-align: center;
+}
+
+.duedate h3{
+    background-color: #000;
+    color: #fff;
+    padding: 7px 20px;
+    border-left: 1px solid #dadada;
+    margin-bottom: 7px;
+    font-weight: 500;
+    font-size: 16px;
+}
+
+.totals{
+    text-align: right;
+    margin-bottom: 100px;
+}
+
+.account_details{
+    background-color: #000;
+    padding: 5px 15px;
+    color: #fff;
+    font-size: 12px;
+    text-align: center;
+}
+
+.items tr td:last-child{
+    opacity: 0;
+    cursor: pointer;
+}
+
+.items tr:hover> td:last-child{
+    opacity: 1;
+    vertical-align: inherit;
+}
+
+.add_item{
+    display: flex;
+}
+
+.add_item div {
+    padding: 0px 5px;
+    border-radius: 50%;
+    color: #fff;
+    font-weight: 700;
+    width: 20px;
+    height: 22px;
+}
+
+.add_item .add{
+    background-color: green;
+    margin-bottom: 7px;
+}
+
+.add_item .remove {
+    background-color: red;
+    line-height: 1.6;
+    margin-left: 5px;
+}
+
+#sales_tax, #payment{
+    text-align: right;
+}
+
+.totals table{
+    text-align: end;
+}
+
+@media print {
+    .account_details, .items thead tr, .duedate h3{
+        background-color: #EDA724;
+
+        -webkit-print-color-adjust: exact; /* Chrome, Safari, newer versions of Edge */
+        print-color-adjust: exact; /* Standard property for other browsers */
+        background-color: #000 !important;
+        color: white !important;
+    }
+
+    .invoice{
+        margin-top: 0;
+    }
+
+    .invoice p{
+        color: #777676;
+    }
+    
+    .invoice h3, h4{
+        color: #FECE00;
+        font-weight: 600;
+    }
+    .invoice input{
+        background-color: transparent;
+        border: none;
+        width: auto;
+        max-width: 80px;
+        padding-right: 0;
+        line-height: 1;
+    }
+    .invoice .flex{
+        display: flex;
+        gap: 120px;
+        margin-bottom: 50px;
+        justify-content: space-between;
+    }
+    .invoice .header{
+        display: flex;
+        gap: 120px;
+        align-items: center; 
+    }
+    
+    .invoice .header h1{
+        font-size: 50px;
+        color: #A9A3A3;
+    }
+
+    .totals table{
+        text-align: end;
+    }
+}
