@@ -1927,11 +1927,10 @@ div.alert_msg {
 }
 
 .prog-pie-chart canvas{
-    width: 80% !important;
-    height: 80% !important;
+    width: 50% !important;
+    height: 50% !important;
     margin: 10px auto;
     padding: 0 !important;
-    margin-left: 20px;
 }
 
 .single-chart{

@@ -200,7 +200,7 @@ $result1 = $mysqli->query($query1);
             <div class="chart chart-shadow" style="margin-top: 20px;">
                 <div class="prog-pie-chart">
                     <h3>Left to Get the Goal</h3>
-                    <canvas class="chart" id="today-goal-left"></canvas>
+                    <canvas class="chart" id="today_goal_left"></canvas>
                 </div>
 
             </div>
@@ -330,6 +330,21 @@ $result1 = $mysqli->query($query1);
         </div>
 
 
+
+        <?php
+        $query = 'SELECT SUM(TotalAmount) AS total_amount FROM gd_pay';
+        $result = $mysqli->query($query);
+        $totalAmount = $result->fetch_assoc()['total_amount'];
+
+        $query1 = 'SELECT SUM(total_paid) AS total_paid FROM gdpays';
+        $result1 = $mysqli->query($query1);
+        $totalPaid = $result1->fetch_assoc()['total_paid'];
+
+        $remainingAmount = $totalAmount - $totalPaid;
+
+        ?>
+
+
     </div>
 
 
@@ -382,6 +397,68 @@ $result1 = $mysqli->query($query1);
             });
 
         });
+
+
+        var totalAmount = <?php echo $totalAmount; ?>;
+        var remainingAmount = <?php echo $remainingAmount; ?>;
+
+        var today_goal_left = {
+            type: 'doughnut',
+            data: {
+                labels: ['Total Amount', 'Amount left to the Goal'],
+                datasets: [{
+                    data: [totalAmount, remainingAmount],
+                    backgroundColor: [
+                        "#fece00",
+                        // "ffff00",
+                        "#ffe200"
+                    ],
+                    borderWidth: 0.5,
+                }]
+            },
+            options: {
+                responsive: false,
+                plugins: {
+                    legend: {
+                        display: false,
+                        labels: {
+                            font: {
+                                size: 8,
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false,
+                        },
+                        ticks: {
+                            color: "#aaaa",
+                            font: {
+                                size: 8
+                            }
+                        },
+                        display: false,
+                    },
+                    y: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: "#aaaa",
+                            font: {
+                                size: 8
+                            }
+                        },
+                        display: false,
+                    },
+                }
+            }
+        };
+
+        var dispPieSummaryelement = document.getElementById("today_goal_left");
+        new Chart(dispPieSummaryelement, today_goal_left);
 
 
         // Search functionality

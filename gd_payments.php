@@ -254,7 +254,7 @@ function floatvalue($val)
             <div class="chart chart-shadow" style="margin-top: 20px;">
                 <div class="prog-pie-chart">
                     <h3>Left to Get the Goal</h3>
-                    <canvas class="chart" id="today-goal-left"></canvas>
+                    <canvas class="chart" id="today_goal_left"></canvas>
                 </div>
 
             </div>
@@ -390,7 +390,18 @@ function floatvalue($val)
 
     </div>
 
+<?php
+$query = 'SELECT SUM(TotalAmount) AS total_amount FROM gd_pay';
+$result = $mysqli->query($query);
+$totalAmount = $result->fetch_assoc()['total_amount'];
 
+$query1 = 'SELECT SUM(total_paid) AS total_paid FROM gdpays';
+$result1 = $mysqli->query($query1);
+$totalPaid = $result1->fetch_assoc()['total_paid'];
+
+$remainingAmount = $totalAmount - $totalPaid;
+
+?>
 
 
 
@@ -403,12 +414,14 @@ function floatvalue($val)
     <script src="https://cdn.jsdelivr.net/gh/stefanpenner/es6-promise@master/dist/es6-promise.min.js"></script>
     <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
 
     <script>
         $(document).ready(function() {
             // Have the previously selected tab open
             var activeTab = sessionStorage.activeTab;
-          
+
             $(".tab-content").fadeIn(1000);
             if (activeTab) {
                 $('.tab-content ' + activeTab).show().siblings().hide();
@@ -441,92 +454,70 @@ function floatvalue($val)
             });
 
         });
-        // var dispSummaryelement = document.getElementById("dis-summary")
         //         // disSummary.defaults.font.size = 8;
         //         var disSummary = new Chart(dispSummaryelement, config);
 
-        var config3 = {
-            type: 'doughnut',
-            data: {
-                labels: ['No label'
-                    // <?php
-                        // $labels = $mysqli->query("SELECT SUM(TotalAmount) AS total_amount FROM gd_pay") or die($mysqli->error);
-                        // while ($row = mysqli_fetch_array($labels)) {
-                        //     echo "'" . $row['TotalAmount'] . "', ";
-                        //     $dispatcher = $row['TotalAmount'];
-                        // }
-                        // 
-                        ?>
+        var totalAmount = <?php echo $totalAmount; ?>;
+    var remainingAmount = <?php echo $remainingAmount; ?>;
+
+    var today_goal_left = {
+        type: 'doughnut',
+        data: {
+            labels: ['Total Amount', 'Amount left to the Goal'],
+            datasets: [{
+                data: [totalAmount, remainingAmount],
+                backgroundColor: [
+                    "#fece00",
+                    // "ffff00",
+                    "#ffe200"
                 ],
-                datasets: [{
-                    data: [88, 5
-                        // <?php
-
-                            // $data = $mysqli->query("SELECT SUM(TotalAmount) AS total_amount FROM gd_pay") or die($mysqli->error);
-                            // while ($row = mysqli_fetch_array($data)) {
-                            //     echo $row['total_amount'] . ",";
-                            // }
-
-                            // 
-                            ?>
-                    ],
-                    backgroundColor: [
-                        "#F94144",
-                        "#F3722C",
-                    ],
-                    borderWidth: 0.5,
-
-                }]
-            },
-            options: {
-                responsive: false,
-                plugins: {
-                    legend: {
-                        display: false,
-                        labels: {
-
-                            // This more specific font property overrides the global property
-                            font: {
-                                size: 8,
-
-                            }
+                borderWidth: 0.5,
+            }]
+        },
+        options: {
+            responsive: false,
+            plugins: {
+                legend: {
+                    display: false,
+                    labels: {
+                        font: {
+                            size: 8,
                         }
                     }
-                },
-                // legend: {
-                //     display: false
-                // },
-                scales: {
-                    x: {
-                        grid: {
-                            display: false,
-                        },
-                        ticks: {
-                            color: "#aaaa",
-                            font: {
-                                size: 8
-                            }
-                        },
-                        display: false,
-                    },
-                    y: {
-                        grid: {
-                            display: false
-                        },
-                        ticks: {
-                            color: "#aaaa",
-                            font: {
-                                size: 8
-                            }
-                        },
-                        display: false,
-                    },
                 }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false,
+                    },
+                    ticks: {
+                        color: "#aaaa",
+                        font: {
+                            size: 8
+                        }
+                    },
+                    display: false,
+                },
+                y: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: "#aaaa",
+                        font: {
+                            size: 8
+                        }
+                    },
+                    display: false,
+                },
             }
-        };
-        var dispPieSummaryelement = document.getElementById("today-goal-left")
-        // disSummary.defaults.font.size = 8;
-        var disPieSummary = new Chart(dispPieSummaryelement, config3);
+        }
+    };
+
+    var dispPieSummaryelement = document.getElementById("today_goal_left");
+    new Chart(dispPieSummaryelement, today_goal_left);
+
 
         // Search functionality
         function search() {
