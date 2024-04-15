@@ -60,8 +60,8 @@ $('.tabs').on('click', '.flag', function(e){
 })
 
 $(document).ready(function () {
-    getNotifications()
-    getonholdtrucks()
+    // getNotifications()
+    // getonholdtrucks()
 
     // Ask for notification permissions
     showNotification();

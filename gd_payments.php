@@ -65,6 +65,9 @@ $payable = $matchedstatusData['count(status)'];
 $query = 'SELECT SUM(TotalAmount) AS total_amount FROM gd_pay';
 $result = $mysqli->query($query);
 
+$gd = $mysqli->query("SELECT * FROM gd_pay") or die($mysqli->error);
+$gds = mysqli_fetch_array($gd);
+
 $query1 = 'SELECT SUM(total_paid) AS total_paid FROM gdpays';
 $result1 = $mysqli->query($query1);
 // if (!empty($_GET['id'])) {
@@ -209,7 +212,7 @@ function floatvalue($val)
 <body style="background-color: var(--body);">
 
 
-    <?php $page_title = "Load Board";
+    <?php $page_title = "GD Payments";
     include ('header.php'); ?>
 
     <!-- <div id="alertmsg_container">
@@ -232,36 +235,15 @@ function floatvalue($val)
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.4.0/chart.js"></script>
 
 
-    <div class="dispatchercharts" style="display: none;">
-        <div class="dis-charts summary">
-            <p>Dispatcher Summary</p>
-            <canvas class="dis-chart" id="dis-summary"
-                style="display: block;box-sizing: border-box;height: 150px !important;"></canvas>
-        </div>
-        <div class=" dis-charts detail">
-            <p>Dispatcher Details</p>
-            <canvas class="chart" id="disDetail"
-                style="display: block;box-sizing: border-box;height: 150px !important;"></canvas>
-        </div>
-        <div class="dis-charts" style="width: 200px">
-            <p>Dispatcher Summary</p>
-            <canvas class="chart" id="disp-pie-summary" style="width: 150px !important;"></canvas>
-        </div>
-    </div>
-
     <div class="indexstats dispatchercharts">
 
         <div class="statusbar_Section" id="undelivered_load_bars">
-            <div style="display: flex;justify-content: space-between;margin-right: 30px;margin-bottom: 30px;">
-                <input onkeyup="search()" style="width: 72%;margin-right: 20px;" type="search" name="search_loadBars"
-                    id="search_loadBars" placeholder="search...">
-                <!-- <select name="search_loadBars_filter" style="width: 20%;">
-                    <option value="load_num">Pro No.</option>
-                    <option value="truck_num">Truck No.</option>
-                    <option value="driver">Driver</option>
-                    <option value="driver">Remaning Distance</option>
-                    <option value="check_notes">Check Notes</option>
+        <div class="autocomplete" style="display: flex;justify-content: space-between;margin-right: 0rem;margin-bottom: 1.875rem;">
+            <!-- <select class="js-example-basic-single" name="state">
+                <option value="AL">Alabama</option>
+                <option value="WY">Wyoming</option>
                 </select> -->
+                <input id="myInput" type="text" name="myCountry" placeholder="Add GD number here" style="width: 100%;margin-right: 0rem;">
             </div>
             <div class="truckNumber" id="truckedit">
                 <div class="modal-content">
@@ -272,24 +254,24 @@ function floatvalue($val)
 
                     <div class="modal-body">
                         <form id="driver_info_form" method="POST" enctype="multipart/form-data">
-                            <input type="hidden" name="id"
+                            <input type="hidden" name="id" id="gdid"
                                 value="<?php echo !empty($truckdetail['truck_id']) ? $truckdetail['truck_id'] : ''; ?>">
-
+                            
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <p class="form-control-static">GD #:
-                                            <?php echo !empty($static_values['gd']) ? $static_values['gd'] : '77'; ?>
+                                            <span id="gdnoText"> <?php echo !empty($static_values['gd']) ? $static_values['gd'] : '77'; ?></span>
                                         </p>
                                     </div>
                                     <div class="form-group">
                                         <p class="form-control-static">Total Amount:
-                                            <?php echo !empty($static_values['total_amount']) ? $static_values['total_amount'] : '7000'; ?>
+                                            <span id="totalAmounttext"><?php echo !empty($static_values['total_amount']) ? $static_values['total_amount'] : '7000'; ?></span>
                                         </p>
                                     </div>
                                     <div class="form-group">
                                         <p class="form-control-static">Status:
-                                            <?php echo !empty($static_values['status']) ? $static_values['status'] : 'Opened'; ?>
+                                            <span id="Statustext"><?php echo !empty($static_values['status']) ? $static_values['status'] : 'Opened'; ?></span>
                                         </p>
                                     </div>
                                 </div>
@@ -338,7 +320,7 @@ function floatvalue($val)
         </div>
         <div class="chartcontain" style="width: 35%;">
             <div class="amountcard">
-                <div class="load_stats">
+                <div class="load_stats" style="margin-left: 0;">
                     <div class="content" style="text-align: center;">
                         <p>Total Amount</p>
                         <h2 style="color:green"><?php if ($result) {
@@ -516,91 +498,233 @@ function floatvalue($val)
 
     <script>
 
+var data = [
+                <?php while($row = mysqli_fetch_array($gd)){
+                    echo "'" .$row['GD_number']. "', ";
+                } ?>
+            ]
+
+            
+            function autocomplete(inp, arr) {
+                /*the autocomplete function takes two arguments,
+                the text field element and an array of possible autocompleted values:*/
+                var currentFocus;
+                /*execute a function when someone writes in the text field:*/
+                inp.addEventListener("input", function(e) {
+                    var a, b, i, val = this.value;
+                    /*close any already open lists of autocompleted values*/
+                    closeAllLists();
+                    if (!val) {
+                        return false;
+                    }
+                    // console.log(val)
+                    currentFocus = -1;
+                    /*create a DIV element that will contain the items (values):*/
+                    a = document.createElement("DIV");
+                    a.setAttribute("id", this.id + "autocomplete-list");
+                    a.setAttribute("class", "autocomplete-items");
+                    /*append the DIV element as a child of the autocomplete container:*/
+                    this.parentNode.appendChild(a);
+                    /*for each item in the array...*/
+                    for (i = 0; i < arr.length; i++) {
+                        /*check if the item starts with the same letters as the text field value:*/
+                        if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+                            /*create a DIV element for each matching element:*/
+                            b = document.createElement("DIV");
+                            /*make the matching letters bold:*/
+                            b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+                            b.innerHTML += arr[i].substr(val.length);
+                            /*insert a input field that will hold the current array item's value:*/
+                            b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+                            /*execute a function when someone clicks on the item value (DIV element):*/
+                            b.addEventListener("click", function(e) {
+                                /*insert the value for the autocomplete text field:*/
+                                val = this.getElementsByTagName("input")[0].value
+                                inp.value = val;
+                                $.ajax({
+                                    type: 'get',
+                                    url: './Assets/backendfiles/gd_pay.php?record='+ val, // Replace 'your_php_script.php' with the path to your PHP script
+                                    data: {gd: val},
+                                    success: function(response) {
+                                        var data =JSON.parse(response)
+                                        console.log(data)
+                                        $("#gdnoText").html(data.GD_number)
+                                        // $("#amount_paid").html(data.PaidAmount)
+                                        $("#totalAmounttext").html(data.TotalAmount)
+                                        $("#Statustext").html(data.Status)
+                                        $("#gdid").val(data.id)
+                                        // Handle the response here, if needed
+                                        // window.location.href = 'gd_payments.php';
+                                        // Optionally, you can display a success message or perform other actions
+                                    },
+                                    error: function(xhr, status, error) {
+                                        // Handle errors here, if any
+                                        console.error(xhr.responseText); // Log the error message to the console
+                                        // Optionally, you can display an error message or perform other actions
+                                    }
+                                });
+
+                                console.log(val)
+                                /*close the list of autocompleted values,
+                                (or any other open lists of autocompleted values:*/
+                                closeAllLists();
+                            });
+                            a.appendChild(b);
+                        }
+                    }
+                });
+                /*execute a function presses a key on the keyboard:*/
+                inp.addEventListener("keydown", function(e) {
+                    var x = document.getElementById(this.id + "autocomplete-list");
+                    if (x) x = x.getElementsByTagName("div");
+                    if (e.keyCode == 40) {
+                        /*If the arrow DOWN key is pressed,
+                        increase the currentFocus variable:*/
+                        currentFocus++;
+                        /*and and make the current item more visible:*/
+                        addActive(x);
+                    } else if (e.keyCode == 38) { //up
+                        /*If the arrow UP key is pressed,
+                        decrease the currentFocus variable:*/
+                        currentFocus--;
+                        /*and and make the current item more visible:*/
+                        addActive(x);
+                    } else if (e.keyCode == 13) {
+                        /*If the ENTER key is pressed, prevent the form from being submitted,*/
+                        e.preventDefault();
+                        if (currentFocus > -1) {
+                            /*and simulate a click on the "active" item:*/
+                            if (x) x[currentFocus].click();
+                        }
+                    }
+                });
+
+                function addActive(x) {
+                    /*a function to classify an item as "active":*/
+                    if (!x) return false;
+                    /*start by removing the "active" class on all items:*/
+                    removeActive(x);
+                    if (currentFocus >= x.length) currentFocus = 0;
+                    if (currentFocus < 0) currentFocus = (x.length - 1);
+                    /*add class "autocomplete-active":*/
+                    x[currentFocus].classList.add("autocomplete-active");
+                }
+
+                function removeActive(x) {
+                    /*a function to remove the "active" class from all autocomplete items:*/
+                    for (var i = 0; i < x.length; i++) {
+                        x[i].classList.remove("autocomplete-active");
+                    }
+                }
+
+                function closeAllLists(elmnt) {
+                    /*close all autocomplete lists in the document,
+                    except the one passed as an argument:*/
+                    var x = document.getElementsByClassName("autocomplete-items");
+                    for (var i = 0; i < x.length; i++) {
+                        if (elmnt != x[i] && elmnt != inp) {
+                            x[i].parentNode.removeChild(x[i]);
+                        }
+                    }
+                }
+                /*execute a function when someone clicks in the document:*/
+                document.addEventListener("click", function(e) {
+                    // console.log(e.target)
+                    closeAllLists(e.target);
+                });
+            }
+
+            autocomplete(document.getElementById("myInput"), data);
+
+            $("#myInput").on("change", function(e){
+                console.log($(this).val())
+            })
+
 
         // var dispSummaryelement = document.getElementById("dis-summary")
         //         // disSummary.defaults.font.size = 8;
         //         var disSummary = new Chart(dispSummaryelement, config);
 
-        var config3 = {
-            type: 'doughnut',
-            data: {
-                labels: [ 'No label'
-                    // <?php
-                    // $labels = $mysqli->query("SELECT SUM(TotalAmount) AS total_amount FROM gd_pay") or die($mysqli->error);
-                    // while ($row = mysqli_fetch_array($labels)) {
-                    //     echo "'" . $row['TotalAmount'] . "', ";
-                    //     $dispatcher = $row['TotalAmount'];
-                    // }
-                    // ?>
-                ],
-                datasets: [{
-                    data: [ 88,5
-                        // <?php
+        // var config3 = {
+        //     type: 'doughnut',
+        //     data: {
+        //         labels: [ 'No label'
+        //             // <?php
+        //             // $labels = $mysqli->query("SELECT SUM(TotalAmount) AS total_amount FROM gd_pay") or die($mysqli->error);
+        //             // while ($row = mysqli_fetch_array($labels)) {
+        //             //     echo "'" . $row['TotalAmount'] . "', ";
+        //             //     $dispatcher = $row['TotalAmount'];
+        //             // }
+        //             // ?>
+        //         ],
+        //         datasets: [{
+        //             data: [ 88,5
+        //                 // <?php
 
-                        // $data = $mysqli->query("SELECT SUM(TotalAmount) AS total_amount FROM gd_pay") or die($mysqli->error);
-                        // while ($row = mysqli_fetch_array($data)) {
-                        //     echo $row['total_amount'] . ",";
-                        // }
+        //                 // $data = $mysqli->query("SELECT SUM(TotalAmount) AS total_amount FROM gd_pay") or die($mysqli->error);
+        //                 // while ($row = mysqli_fetch_array($data)) {
+        //                 //     echo $row['total_amount'] . ",";
+        //                 // }
 
-                        // ?>
-                    ],
-                    backgroundColor: [
-                        "#F94144",
-                        "#F3722C",
-                    ],
-                    borderWidth: 0.5,
+        //                 // ?>
+        //             ],
+        //             backgroundColor: [
+        //                 "#F94144",
+        //                 "#F3722C",
+        //             ],
+        //             borderWidth: 0.5,
 
-                }]
-            },
-            options: {
-                responsive: false,
-                plugins: {
-                    legend: {
-                        display: false,
-                        labels: {
+        //         }]
+        //     },
+        //     options: {
+        //         responsive: false,
+        //         plugins: {
+        //             legend: {
+        //                 display: false,
+        //                 labels: {
 
-                            // This more specific font property overrides the global property
-                            font: {
-                                size: 8,
+        //                     // This more specific font property overrides the global property
+        //                     font: {
+        //                         size: 8,
 
-                            }
-                        }
-                    }
-                },
-                // legend: {
-                //     display: false
-                // },
-                scales: {
-                    x: {
-                        grid: {
-                            display: false,
-                        },
-                        ticks: {
-                            color: "#aaaa",
-                            font: {
-                                size: 8
-                            }
-                        },
-                        display: false,
-                    },
-                    y: {
-                        grid: {
-                            display: false
-                        },
-                        ticks: {
-                            color: "#aaaa",
-                            font: {
-                                size: 8
-                            }
-                        },
-                        display: false,
-                    },
-                }
-            }
-        };
-        var dispPieSummaryelement = document.getElementById("today-goal-left")
-        // disSummary.defaults.font.size = 8;
-        var disPieSummary = new Chart(dispPieSummaryelement, config3);
+        //                     }
+        //                 }
+        //             }
+        //         },
+        //         // legend: {
+        //         //     display: false
+        //         // },
+        //         scales: {
+        //             x: {
+        //                 grid: {
+        //                     display: false,
+        //                 },
+        //                 ticks: {
+        //                     color: "#aaaa",
+        //                     font: {
+        //                         size: 8
+        //                     }
+        //                 },
+        //                 display: false,
+        //             },
+        //             y: {
+        //                 grid: {
+        //                     display: false
+        //                 },
+        //                 ticks: {
+        //                     color: "#aaaa",
+        //                     font: {
+        //                         size: 8
+        //                     }
+        //                 },
+        //                 display: false,
+        //             },
+        //         }
+        //     }
+        // };
+        // var dispPieSummaryelement = document.getElementById("today-goal-left")
+        // // disSummary.defaults.font.size = 8;
+        // var disPieSummary = new Chart(dispPieSummaryelement, config3);
 
         // Search functionality
         function search() {

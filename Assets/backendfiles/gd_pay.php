@@ -1,10 +1,10 @@
 <?php
 include 'config.php';
 
-$action_type = $_GET['action_type']; // Get the value of action_type from the URL
-$id = $_GET['id']; 
+// $action_type = $_GET['action_type']; // Get the value of action_type from the URL
+// $id = $_GET['id']; 
 
-echo $id;
+// echo $id;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $gdbank = $_POST['gdbank'];
@@ -32,30 +32,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 
-if ($_SERVER["REQUEST_METHOD"] == "GET") {
-    // Fetch data from the database
-$query = "SELECT * FROM gd_pay";
-$result = $mysqli->query($query);
+// if ($_SERVER["REQUEST_METHOD"] == "GET") {
+//     // Fetch data from the database
+// $query = "SELECT * FROM gd_pay";
+// $result = $mysqli->query($query);
 
-// Check if there are any rows returned
-if ($result->num_rows > 0) {
-    $data = array();
+// // Check if there are any rows returned
+// if ($result->num_rows > 0) {
+//     $data = array();
 
-    // Fetch each row and add it to the $data array
-    while ($row = $result->fetch_assoc()) {
-        $data[] = $row;
-    }
+//     // Fetch each row and add it to the $data array
+//     while ($row = $result->fetch_assoc()) {
+//         $data[] = $row;
+//     }
 
-    // Return the data as JSON
-    echo json_encode($data);
-} else {
-    // If no rows found, return an empty array
-    echo json_encode(array());
-}
+//     // Return the data as JSON
+//     echo json_encode($data);
+// } else {
+//     // If no rows found, return an empty array
+//     echo json_encode(array());
+// }
 
-}
-$query = [];
-$lf = "";
+// }
+// $query = [];
+// $lf = "";
 // Loads en route
 if(isset($_REQUEST['opening'])){
     $queryq .= " where n.Status= 'opening' ORDER BY id DESC";
@@ -71,7 +71,7 @@ if(isset($_REQUEST['opening'])){
     $query = $mysqli->query($queryq) or die($mysqli->error);
     
 
-}else if  ($_REQUEST["action_type"] == 'edit_gd' ) {
+}else if  (isset($_REQUEST['action_type']) && $_REQUEST["action_type"] == 'edit_gd' ) {
     $query = "SELECT * FROM gd_pay";
     $result = $mysqli->query($query);
     
@@ -91,5 +91,32 @@ if(isset($_REQUEST['opening'])){
         echo json_encode(array());
     }
     
+} else if  (isset($_REQUEST['record']) && $_REQUEST["record"] ) {
+    $gd = $_GET['gd'];
+
+    $query = "SELECT * FROM gd_pay where GD_number = '$gd' limit 1";
+    $result = $mysqli->query($query)->fetch_assoc();
+
+    // print_r($result);
+
+    echo json_encode($result);
+    
+    // Check if there are any rows returned
+    // if ($result->num_rows > 0) {
+    //     $data = array();
+    
+    //     // Fetch each row and add it to the $data array
+    //     while ($row = $result->fetch_assoc()) {
+    //         $data[] = $row;
+    //     }
+    
+    //     // Return the data as JSON
+    //     echo json_encode($data);
+    // } else {
+    //     // If no rows found, return an empty array
+    //     echo json_encode(array());
+    // }
+    
 }
+
 ?>

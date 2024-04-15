@@ -44,7 +44,7 @@ CREATE TABLE `gdpays` (
 CREATE TABLE `gd_pay` (
   `id` int(11) NOT NULL,
   `Gd_bankDate` date DEFAULT NULL,
-  `GD_number` int(11) DEFAULT NULL,
+  `GD_number` Text DEFAULT NULL,
   `TotalAmount` varchar(255) DEFAULT NULL,
   `PaidAmount` varchar(255) DEFAULT NULL,
   `Status` varchar(50) DEFAULT NULL
