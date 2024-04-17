@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 15, 2024 at 10:22 AM
+-- Generation Time: Apr 17, 2024 at 12:28 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.0.28
 
@@ -31,7 +31,8 @@ CREATE TABLE `gdpays` (
   `id` int(11) NOT NULL,
   `total_paid` varchar(255) DEFAULT NULL,
   `status` varchar(255) DEFAULT NULL,
-  `date` date DEFAULT NULL
+  `date` date DEFAULT NULL,
+  `gid` int(11) NOT NULL DEFAULT 10
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -42,7 +43,6 @@ CREATE TABLE `gdpays` (
 
 CREATE TABLE `gd_pay` (
   `id` int(11) NOT NULL,
-  `gpid` int(11) DEFAULT NULL,
   `Gd_bankDate` date DEFAULT NULL,
   `GD_number` varchar(255) DEFAULT NULL,
   `TotalAmount` varchar(255) DEFAULT NULL,
@@ -59,14 +59,14 @@ CREATE TABLE `gd_pay` (
 -- Indexes for table `gdpays`
 --
 ALTER TABLE `gdpays`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `kf_gid` (`gid`);
 
 --
 -- Indexes for table `gd_pay`
 --
 ALTER TABLE `gd_pay`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_gd_pay_gpid` (`gpid`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -89,10 +89,10 @@ ALTER TABLE `gd_pay`
 --
 
 --
--- Constraints for table `gd_pay`
+-- Constraints for table `gdpays`
 --
-ALTER TABLE `gd_pay`
-  ADD CONSTRAINT `fk_gd_pay_gpid` FOREIGN KEY (`gpid`) REFERENCES `gdpays` (`id`);
+ALTER TABLE `gdpays`
+  ADD CONSTRAINT `kf_gid` FOREIGN KEY (`gid`) REFERENCES `gd_pay` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
