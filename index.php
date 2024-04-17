@@ -97,7 +97,7 @@ $result1 = $mysqli->query($query1);
         <div class="statusbar_Section" id="undelivered_load_bars">
 
             <div class="autocomplete" style="display: flex;justify-content: space-between;margin-right: 0rem;margin-bottom: 1.875rem;">
-            <!-- <select class="js-example-basic-single" name="state">
+                <!-- <select class="js-example-basic-single" name="state">
                 <option value="AL">Alabama</option>
                 <option value="WY">Wyoming</option>
                 </select> -->
@@ -122,7 +122,7 @@ $result1 = $mysqli->query($query1);
                     </div>
 
                     <div class="modal-body">
-                        <form id="driver_info_form" class="driver_info_form" method="POST" enctype="multipart/form-data">
+                        <form id="driver_info_form" method="POST" enctype="multipart/form-data">
                             <input type="hidden" name="id" id="id">
 
                             <div class="row">
@@ -333,6 +333,18 @@ $result1 = $mysqli->query($query1);
             </table>
         </div>
 
+        <?php
+        $query = 'SELECT SUM(TotalAmount) AS total_amount FROM gd_pay';
+        $result = $mysqli->query($query);
+        $totalAmount = $result->fetch_assoc()['total_amount'];
+
+        $query1 = 'SELECT SUM(total_paid) AS total_paid FROM gdpays';
+        $result1 = $mysqli->query($query1);
+        $totalPaid = $result1->fetch_assoc()['total_paid'];
+
+        $remainingAmount = $totalAmount - $totalPaid;
+
+        ?>
 
     </div>
 
@@ -380,13 +392,76 @@ $result1 = $mysqli->query($query1);
                 e.preventDefault();
             });
 
+
+            var totalAmount = <?php echo $totalAmount; ?>;
+            var remainingAmount = <?php echo $remainingAmount; ?>;
+
+            var today_goal_left = {
+                type: 'doughnut',
+                data: {
+                    labels: ['Total Amount', 'Amount left to the Goal'],
+                    datasets: [{
+                        data: [totalAmount, remainingAmount],
+                        backgroundColor: [
+                            "#fece00",
+                            // "ffff00",
+                            "#ffe200"
+                        ],
+                        borderWidth: 0.5,
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    plugins: {
+                        legend: {
+                            display: false,
+                            labels: {
+                                font: {
+                                    size: 8,
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false,
+                            },
+                            ticks: {
+                                color: "#aaaa",
+                                font: {
+                                    size: 8
+                                }
+                            },
+                            display: false,
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: "#aaaa",
+                                font: {
+                                    size: 8
+                                }
+                            },
+                            display: false,
+                        },
+                    }
+                }
+            };
+
+            var dispPieSummaryelement = document.getElementById("today_goal_left");
+            new Chart(dispPieSummaryelement, today_goal_left);
+
             var data = [
-                <?php while($row = mysqli_fetch_array($gd)){
-                    echo "'" .$row['GD_number']. "', ";
+                <?php while ($row = mysqli_fetch_array($gd)) {
+                    echo "'" . $row['GD_number'] . "', ";
                 } ?>
             ]
 
-            
+
+
             function autocomplete(inp, arr) {
                 /*the autocomplete function takes two arguments,
                 the text field element and an array of possible autocompleted values:*/
@@ -425,10 +500,12 @@ $result1 = $mysqli->query($query1);
                                 inp.value = val;
                                 $.ajax({
                                     type: 'get',
-                                    url: './Assets/backendfiles/gd_pay.php?record='+ val, // Replace 'your_php_script.php' with the path to your PHP script
-                                    data: {gd: val},
+                                    url: './Assets/backendfiles/gd_pay.php?record=' + val, // Replace 'your_php_script.php' with the path to your PHP script
+                                    data: {
+                                        gd: val
+                                    },
                                     success: function(response) {
-                                        var data =JSON.parse(response)
+                                        var data = JSON.parse(response)
                                         console.log(data)
                                         $("#gdno").val(data.GD_number)
                                         $("#amount_paid").val(data.PaidAmount)
@@ -519,11 +596,44 @@ $result1 = $mysqli->query($query1);
 
             autocomplete(document.getElementById("myInput"), data);
 
-            $("#myInput").on("change", function(e){
+            $("#myInput").on("change", function(e) {
                 console.log($(this).val())
             })
 
         });
+
+        $("#loadBoard1, #loadBoard2, #loadBoard3").on("click", ".driver_info_form", function(e) {
+            var loadID = $(this).data("load_id");
+            console.log("loadID index:", loadID)
+            $.ajax({
+                type: "get", // or "GET" depending on your backend implementation
+                url: './Assets/backendfiles/gd_pay.php?gdrecord=' + loadID, // Replace 'your_php_script.php' with the path to your PHP script
+                data: {
+                    gd: loadID // Sending loadID as the 'record' parameter
+                },
+                success: function(response) {
+                    console.log("Response:", response)
+                    var data = JSON.parse(response);
+                    console.log(data);
+                    $("#gdno").val(data.GD_number);
+                    $("#amount_paid").val(data.PaidAmount);
+                    $("#total_amount").val(data.TotalAmount);
+                    $("#status").val(data.Status);
+                    $("#gdbank").val(data.Gd_bankDate);
+                    $("#id").val(data.id);
+                    // Handle the response here, if needed
+                    // window.location.href = 'gd_payments.php';
+                    // Optionally, you can display a success message or perform other actions
+                },
+                error: function(xhr, status, error) {
+                    // Handle errors here, if any
+                    console.error(xhr.responseText); // Log the error message to the console
+                    // Optionally, you can display an error message or perform other actions
+                }
+            });
+        });
+
+
 
         // Search functionality
         function search() {
@@ -547,79 +657,11 @@ $result1 = $mysqli->query($query1);
             }
 
 
-            // Call getGds() function with the search query
-
-
-        // }
 
 
 
 
-        $(document).ready(function() {
-            $('#driver_info_form').submit(function(event) {
-                // Prevent the default form submission
-                event.preventDefault();
 
-                // Serialize the form data
-                var formData = $(this).serialize();
-
-                // Send the form data via AJAX
-                $.ajax({
-                    type: 'POST',
-                    url: './Assets/backendfiles/gd_pay.php', // Replace 'your_php_script.php' with the path to your PHP script
-                    data: formData,
-                    success: function(response) {
-                        // Handle the response here, if needed
-                        // window.location.href = 'gd_payments.php';
-                        // Optionally, you can display a success message or perform other actions
-                    },
-                    error: function(xhr, status, error) {
-                        // Handle errors here, if any
-                        console.error(xhr.responseText); // Log the error message to the console
-                        // Optionally, you can display an error message or perform other actions
-                    }
-                });
-            });
-
-
-        });
-
-        
-
-        // var Data = [];
-
-        // function filterByGDNumber(data, gdNumber) {
-        //     return data.filter(function(record) {
-        //         return record.GD_number === gdNumber;
-        //     });
-        // }
-
-        // console.log("proper data:", Data)
-        // // Define a variable to store the filtered data
-        // var filteredData = []; // Initialize filteredData as an empty array
-
-        // Define the callback function to handle the response
-        // function handleResponse(response) {
-        //     if (response) {
-        //         // Handle the response data here
-        //         var Data = response;
-        //         console.log("Data:", Data);
-
-        //         // Extract GD_number values
-        //         filteredData = Data.map(function(item) {
-        //             return item.GD_number;
-        //         });
-        //         console.log("Filtered Data:", filteredData);
-        //     } else {
-        //         // Handle the case where the request fails or returns empty data
-        //         console.log("Failed to fetch data.");
-        //     }
-        // }
-
-        // // Call fetchData with the callback function to handle the response
-        // fetchData(handleResponse);
-
-        // async function fetchDat() {
             try {
                 const response = $.ajax({
                     url: './Assets/backendfiles/gd_pay.php',
@@ -633,7 +675,48 @@ $result1 = $mysqli->query($query1);
             }
         }
 
-        
+        $(document).ready(function() {
+            $('#driver_info_form').submit(function(event) {
+                // Prevent the default form submission
+                event.preventDefault();
+
+                var formId = $('#id').val();
+                console.log("Form ID:", formId);
+
+
+                // Serialize the form data
+                var formData = $(this).serialize();
+                // Send the form data via AJAX
+                $.ajax({
+                    type: 'POST',
+                    url: './Assets/backendfiles/gd_pay.php?uid=' + formId, // Replace 'your_php_script.php' with the path to your PHP script
+                    data: formData,
+                    success: function(response) {
+                        // console.log("Response:", response)
+                        fetchloadrows(
+                            ["opening", "posted", "bs_matched"],
+                            ["table1", "table2", "table3"]
+                        );
+
+                    },
+                    error: function(xhr, status, error) {
+                        // Handle errors here, if any
+                        console.error(xhr.responseText); // Log the error message to the console
+                        // Optionally, you can display an error message or perform other actions
+                    }
+                });
+            });
+
+
+        });
+
+        $(document).ready(function(){
+    $('.submit, .cancel').prop('disabled', true).css('cursor', 'not-allowed');
+    $('#gdno').keyup(function(){
+        var isEmpty = $(this).val().length === 0;
+        $('.submit, .cancel').prop('disabled', isEmpty).css('cursor', isEmpty ? 'not-allowed' : 'pointer');
+    });
+});
     </script>
 
 

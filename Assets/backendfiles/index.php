@@ -49,8 +49,39 @@ if (($_REQUEST['action_type'] == 'delete') && !empty($_GET['id'])) {
 
     // Send the response as JSON
     echo json_encode(array($response));
+} elseif ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    $gd = $_GET['storegdp'];
+    // $gd = $_GET['gd'];
+    $status = $_POST['gdpstatus'];
+    $total_amount = $_POST['amount_paid'];
+    $date = $_POST['gddate'];
+
+    // Insert the record into gdpays
+    $insertQuery = "INSERT INTO gdpays (total_paid, status, date, gid) VALUES ('$total_amount', '$status', '$date', '$gd')";
+    $insertResult = $mysqli->query($insertQuery);
+
+    if ($gd) {
+        $updateQuery = "UPDATE gdpays 
+        SET total_paid = '$total_amount', 
+            status = '$status', 
+            date = '$date' 
+        WHERE id = $gd";
+
+        // Execute the query
+        $result = $mysqli->query($updateQuery);
+        
+    } else {
+        $insertQuery = "INSERT INTO gdpays (total_paid, status, date, gid) VALUES ('$total_amount', '$status', '$date', '$gd')";
+        $insertResult = $mysqli->query($insertQuery);
+    }
+
+
+    // if ($insertResult) {
+    //     // Insertion successful
+    //     echo "Record inserted into gdpays successfully.";
+    // } else {
+    //     // Insertion failed
+    //     echo "Error: " . $mysqli->error;
+    // }
 }
-
-
-
-?>
