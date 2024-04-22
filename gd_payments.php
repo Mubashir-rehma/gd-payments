@@ -312,7 +312,7 @@ function floatvalue($val)
     <div class=outer-circle></div>
 
     <div class="tab-content">
-        <div class="table tabcontent active" id="payable" style=" display: block;">
+        <div class="table tabcontent active" id="Payable" style=" display: block;">
             <table id="table4" style="width: 100%;">
                 <thead>
                     <tr style="background: none; text-align: center;width: 100%;">
@@ -362,7 +362,7 @@ function floatvalue($val)
             </table>
         </div>
 
-        <div class="table tabcontent" id="paid">
+        <div class="table tabcontent" id="Paid">
             <table id="table6" style="width: 100%;">
                 <thead>
                     <tr style="background: none; text-align: center;width: 100%;">
@@ -440,7 +440,6 @@ function floatvalue($val)
             // Enable, disable and switch tabs on click
             $('.navbar .menu li a').on('click', function(e) {
                 var currentAttrValue = $(this).attr('href');
-                console.log("currentAttrValue", currentAttrValue)
                 // Show/Hide Tabs
                 $('.tab-content ' + currentAttrValue).fadeIn(2000).siblings().hide();
                 sessionStorage.activeTab = currentAttrValue;
@@ -476,7 +475,6 @@ function floatvalue($val)
                 if (!val) {
                     return false;
                 }
-                // console.log(val)
                 currentFocus = -1;
                 /*create a DIV element that will contain the items (values):*/
                 a = document.createElement("DIV");
@@ -507,8 +505,8 @@ function floatvalue($val)
                                     gd: val
                                 },
                                 success: function(response) {
+                                    $(".submit").prop("disabled", false).css('cursor', 'pointer')
                                     var data = JSON.parse(response)
-                                    console.log(data)
                                     $("#gdnoText").html(data.GD_number)
                                     // $("#amount_paid").html(data.PaidAmount)
                                     $("#totalAmounttext").html(data.TotalAmount)
@@ -516,18 +514,15 @@ function floatvalue($val)
                                     $("#gddate").html(data.Gd_bankDate)
                                     $("#gdid").val(data.id)
                                     $('#gdpayid').val(data.gdpays_id)
-                                    // Handle the response here, if needed
-                                    // window.location.href = 'gd_payments.php';
-                                    // Optionally, you can display a success message or perform other actions
                                 },
                                 error: function(xhr, status, error) {
                                     // Handle errors here, if any
                                     console.error(xhr.responseText); // Log the error message to the console
+                                    $(".submit").prop("disabled", true).css('cursor', 'not-allowed');
                                     // Optionally, you can display an error message or perform other actions
                                 }
                             });
 
-                            console.log(val)
                             /*close the list of autocompleted values,
                             (or any other open lists of autocompleted values:*/
                             closeAllLists();
@@ -541,8 +536,6 @@ function floatvalue($val)
                 var x = document.getElementById(this.id + "autocomplete-list");
                 if (x) x = x.getElementsByTagName("div");
                 if (e.keyCode == 40) {
-                    /*If the arrow DOWN key is pressed,
-                    increase the currentFocus variable:*/
                     currentFocus++;
                     /*and and make the current item more visible:*/
                     addActive(x);
@@ -592,7 +585,6 @@ function floatvalue($val)
             }
             /*execute a function when someone clicks in the document:*/
             document.addEventListener("click", function(e) {
-                // console.log(e.target)
                 closeAllLists(e.target);
             });
         }
@@ -600,7 +592,7 @@ function floatvalue($val)
         autocomplete(document.getElementById("myInput"), data);
 
         $("#myInput").on("change", function(e) {
-            console.log($(this).val())
+
         })
 
         var totalAmount = <?php echo $totalAmount; ?>;
@@ -667,18 +659,57 @@ function floatvalue($val)
 
 
         $(document).ready(function() {
+            // Function to fetch data based on id from URL
+            fetchRecordFromURL();
+
+            function fetchRecordFromURL() {
+                // Parse the URL to get query parameters
+                var urlParams = new URLSearchParams(window.location.search);
+
+                // Get the value of the 'id' parameter from the URL
+                var idFromURL = urlParams.get('id');
+                // Check if idFromURL exists
+                if (idFromURL) {
+                    // AJAX request to fetch record based on id
+                    $.ajax({
+                        type: 'GET',
+                        url: './Assets/backendfiles/gd_pay.php?record=' + idFromURL,
+                        data: {
+                            gd: idFromURL
+                        },
+                        success: function(response) {
+                            var data = JSON.parse(response);
+                            $("#gdnoText").html(data.GD_number);
+                            // $("#amount_paid").html(data.PaidAmount);
+                            $("#totalAmounttext").html(data.TotalAmount);
+                            $("#Statustext").html(data.Status);
+                            $("#gddate").html(data.Gd_bankDate);
+                            $("#gdid").val(data.id);
+                            $('#gdpayid').val(data.gdpays_id);
+                            // Handle the response here, if needed
+                            // Optionally, you can display a success message or perform other actions
+                        },
+                        error: function(xhr, status, error) {
+                            // Handle errors here, if any
+                            console.error(xhr.responseText); // Log the error message to the console
+                            // Optionally, you can display an error message or perform other actions
+                        }
+                    });
+                }
+            }
+        });
+
+        $(document).ready(function() {
             $('#gd_info_form').submit(function(event) {
                 // Prevent the default form submission
                 event.preventDefault();
 
                 // Serialize the form data
                 var formData = $(this).serialize();
+
                 var gdVal = $('#gdpayid').val();
-                console.log("gdval", gdVal)
                 var val = $('#gdid').val();
                 var loadID = $(this).data("gp_id");
-                console.log("loadID:", loadID);
-                console.log("val", val)
                 // Define the URL based on the presence of loadID
                 var url = './Assets/backendfiles/index.php';
                 if (gdVal) {
@@ -687,14 +718,19 @@ function floatvalue($val)
                     url += '?storegdp=' + val;
                 }
 
-                console.log("Url", url)
                 // Send the form data via AJAX
                 $.ajax({
                     type: 'POST',
                     url: url,
                     data: formData,
                     success: function(response) {
-                        console.log("response", response)
+                        // Reset the form fields
+                        $('#gddate').val('');
+                        $('#amount_paid').val('');
+                        $('#gdsstatus').val('partially_paid'); // Reset select element to its default option
+                        // Optionally, you can also reset the hidden inputs
+                        $('#gdid').val('');
+                        $('#gdpayid').val('');
                         fetchgdrows(
                             ["Payable", "partially_paid", "Paid"],
                             ["table4", "table5", "table6"]
@@ -718,9 +754,12 @@ function floatvalue($val)
 
 
 
+
+
+
         $("#loadBoard4, #loadBoard5, #loadBoard6").on("click", ".gd_info_form", function(e) {
+            $(".submit").prop("disabled", false).css('cursor', 'pointer');
             var loadID = $(this).data("gp_id");
-            console.log("loadID:", loadID)
             $.ajax({
                 type: "get", // or "GET" depending on your backend implementation
                 url: './Assets/backendfiles/gd_pay.php?gdpayrecord=' + loadID, // Replace 'your_php_script.php' with the path to your PHP script
@@ -728,9 +767,7 @@ function floatvalue($val)
                     gd: loadID // Sending loadID as the 'record' parameter
                 },
                 success: function(response) {
-                    console.log("Response:", response)
                     var data = JSON.parse(response);
-                    console.log(data);
                     $("#gdnoText").html(data.GD_number)
                     $("#amount_paid").val(data.PaidAmount)
                     $("#gddate").val(data.date)
@@ -751,6 +788,7 @@ function floatvalue($val)
                 }
             });
         });
+
 
 
         // Search functionality
@@ -778,14 +816,30 @@ function floatvalue($val)
             }
         }
 
-        $(document).ready(function(){
-    $('.submit, .cancel').prop('disabled', true).css('cursor', 'not-allowed');
-    $('#amount_paid').keyup(function(){
-        var isEmpty = $(this).val().length === 0;
-        $('.submit, .cancel').prop('disabled', isEmpty).css('cursor', isEmpty ? 'not-allowed' : 'pointer');
-    });
-});
+        //         $(document).ready(function(){
+        //     $('.submit, .cancel').prop('disabled', true).css('cursor', 'not-allowed');
 
+
+
+        $(document).ready(function() {
+            // Disable submit button initially
+            $(".submit").prop("disabled", true).css('cursor', 'not-allowed');
+
+            // Add event listener to form inputs
+            $(".form-control").on("input", function() {
+                var formHasValue = false;
+                // Check if any input field has a value
+                $(".form-control").each(function() {
+                    if ($(this).val().trim() !== "") {
+                        formHasValue = true;
+                        return false; // Exit the loop if any input field has a value
+                    }
+                });
+                // Enable or disable submit button based on formHasValue
+                $(".submit").prop("disabled", !formHasValue).css('cursor', formHasValue ? 'pointer' : 'not-allowed');
+            });
+
+        });
     </script>
 
 
