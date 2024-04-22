@@ -13,7 +13,7 @@ class DB
     private $dbHost     = "localhost";
     private $dbUsername = "root";
     private $dbPassword = "";
-    private $dbName     = "logisticscrm";
+    private $dbName     = "gdpayments";
     private $newload = "newload";
     private $load_tracking = "load_tracking";
     private $conFiles     = "rate_con_files";
