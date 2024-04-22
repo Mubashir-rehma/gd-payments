@@ -51,9 +51,6 @@ $gds = mysqli_fetch_array($gd);
 if (isset($_GET['id'])) {
     // Retrieve the ID from the URL
     $loadID = $_GET['id'];
-
-    // Now you can use $loadID in your PHP code
-    echo "The ID is: " . $loadID;
     $query = "SELECT * FROM gd_pay WHERE id = $loadID";
     $result = $mysqli->query($query);
     print_r($result);

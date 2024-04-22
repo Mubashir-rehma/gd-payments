@@ -312,7 +312,7 @@ function floatvalue($val)
     <div class=outer-circle></div>
 
     <div class="tab-content">
-        <div class="table tabcontent active" id="payable" style=" display: block;">
+        <div class="table tabcontent active" id="Payable" style=" display: block;">
             <table id="table4" style="width: 100%;">
                 <thead>
                     <tr style="background: none; text-align: center;width: 100%;">
@@ -362,7 +362,7 @@ function floatvalue($val)
             </table>
         </div>
 
-        <div class="table tabcontent" id="paid">
+        <div class="table tabcontent" id="Paid">
             <table id="table6" style="width: 100%;">
                 <thead>
                     <tr style="background: none; text-align: center;width: 100%;">
@@ -541,8 +541,6 @@ function floatvalue($val)
                 var x = document.getElementById(this.id + "autocomplete-list");
                 if (x) x = x.getElementsByTagName("div");
                 if (e.keyCode == 40) {
-                    /*If the arrow DOWN key is pressed,
-                    increase the currentFocus variable:*/
                     currentFocus++;
                     /*and and make the current item more visible:*/
                     addActive(x);
@@ -778,13 +776,41 @@ function floatvalue($val)
             }
         }
 
-        $(document).ready(function(){
-    $('.submit, .cancel').prop('disabled', true).css('cursor', 'not-allowed');
-    $('#amount_paid').keyup(function(){
-        var isEmpty = $(this).val().length === 0;
-        $('.submit, .cancel').prop('disabled', isEmpty).css('cursor', isEmpty ? 'not-allowed' : 'pointer');
-    });
+//         $(document).ready(function(){
+//     $('.submit, .cancel').prop('disabled', true).css('cursor', 'not-allowed');
+    
+
+
+$(function() {
+  $('#amount_paid, #gdsstatus').on('keyup change',function() {
+    if ($('#amount_paid').val() == '' || $('#gdsstatus').val() == '') {
+      $('.submit').prop('disabled', true).css('cursor', 'not-allowed');
+    } else {
+      $('.submit').prop('disabled', false).css('cursor', 'pointer');
+    }
+  });
+})
+
+
+function check(val) {
+    var btn = $('.submit');
+    if (val) {
+        btn.prop("disabled", false);
+        btn.css("cursor", "pointer");
+    } else {
+        btn.prop("disabled", true);
+        btn.css("cursor", "not-allowed");
+    }
+}
+
+$('#gddate').change(function(e) {
+    check($(this).val());
 });
+
+check($('#gddate').val());
+
+
+
 
     </script>
 
