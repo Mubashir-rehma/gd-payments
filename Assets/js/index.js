@@ -664,39 +664,10 @@ $("body").on("click", ".tab_nav", function (e) {
   }
 
   $(this).addClass(" active");
-  console.log(activevan);
   $(".dis_tab").eq(activevan).css("display", "flex");
 });
 
-// Submit new load form
 
-// $(document).ready(function () {
-//   $("#driver_info_form").submit(function (event) {
-//     // Prevent the default form submission
-//     event.preventDefault();
-
-//     // Serialize the form data
-//     var formData = $(this).serialize();
-
-//     // Send the form data via AJAX
-//     $.ajax({
-//       type: "POST",
-//       url: "./Assets/backendfiles/gd_pay.php", // Replace 'your_php_script.php' with the path to your PHP script
-//       data: formData,
-//       success: function (response) {
-//         // Handle the response here, if needed
-//         // window.location.href = 'gd_payments.php';
-//         fetchloadrows(["opening"], ["table1"]);
-//         // Optionally, you can display a success message or perform other actions
-//       },
-//       error: function (xhr, status, error) {
-//         // Handle errors here, if any
-//         console.error(xhr.responseText); // Log the error message to the console
-//         // Optionally, you can display an error message or perform other actions
-//       },
-//     });
-//   });
-// });
 
 // Load Load rating
 $(document).on("submit", "form#load_rating", function (e) {
@@ -785,7 +756,6 @@ function initMap(ele, lat, lng) {
 
   startAutocomplete.addListener("place_changed", function () {
     place = startAutocomplete.getPlace();
-    // console.log(place.geometry.location.lat())
     lat.value = place.geometry.location.lat();
     lng.value = place.geometry.location.lng();
     endValue = place.formatted_address;
@@ -811,7 +781,6 @@ function showAlternativeRoutes(
       provideRouteAlternatives: true,
     },
     function (response, status) {
-      // console.log(response)
       if (status === "OK") {
         var totle_routes = response.routes.length - 1;
 
@@ -824,7 +793,6 @@ function showAlternativeRoutes(
         clobtn.removeAttribute("disabled", "disabled");
         clobtn.textContent = "Update";
 
-        // console.log({distance: distance, duration: duration})
       } else {
         clobtn.removeAttribute("disabled", "disabled");
         clobtn.textContent = "Update";
@@ -1030,7 +998,6 @@ $(
 ).on("click", ".load_action", function (e) {
   var loadID = $(this).data("load_id");
   var action_type = $(this).data("action_type");
-  console.log("loadID:", loadID);
   if (action_type == "delete") {
     var confirmed = confirm("Are you sure you want to delete!");
   } else {
@@ -1049,7 +1016,6 @@ $(
       data: loadID,
       success: function (data) {
         data = JSON.parse(data)[0];
-        console.log("data", data);
         if (data.success == "1") {
           setTimeout(function () {
             $("#alert_msg").css({
@@ -1082,32 +1048,9 @@ $(
   }
 });
 
-// var loadID = "";
-// // Get Edit load Form
-// $("#loadBoard1, #loadBoard2, #loadBoard3").on(
-//   "click",
-//   ".driver_info_form",
-//   function (e) {
-//     loadID = $(this).data("load_id");
-//     console.log(loadID);
-//     var actionType = "updateRecord";
-//     var url =
-//       "./Assets/backendfiles/gd_pay.php?action_type=" +
-//       actionType +
-//       "&id=" +
-//       loadID;
-//     $.ajax({
-//       type: "POST",
-//       url: url,
-//       success: function (data) {
-//         // You can perform other actions with the data here if needed
-//       },
-//     });
-//   }
-// );
+
 
 $("body").on("click", ".load_edit_close", function (e) {
-  // console.log($(".newloadedit_modal")[0])
   $(".newloadedit_modal")[0].remove();
 });
 
@@ -1130,38 +1073,7 @@ $("body").on("click", ".close_dispatcher.close", function (e) {
   $(this).parent().parent().remove();
 });
 
-// $(document).on("submit", "form#driver_info_form", function (e) {
-//   // Prevent the default form submission
-//   e.preventDefault();
 
-//   // Serialize the form data
-//   var formData = $(this).serialize();
-//   console.log("formData:", formData);
-//   //  loadID = $(this).data("load_id");
-//   console.log("LoadiD", loadID);
-//   // Send the form data via AJAX
-//   $.ajax({
-//     type: "POST",
-//     url: "./Assets/backendfiles/gd_pay.php?id=" + loadID, // Replace 'your_php_script.php' with the path to your PHP script
-//     data: formData,
-//     success: function (response) {
-//       fetchloadrows(
-//         ["opening", "posted", "bs_matched"],
-//         ["table1", "table2", "table3"]
-//       );
-//       $("form#driver_info_form")[0].reset();
-//       // Handle the response here, if needed
-//       // window.location.href = 'gd_payments.php';
-//       // Optionally, you can display a success message or perform other actions
-//     },
-//     error: function (xhr, status, error) {
-//       // Handle errors here, if any
-//       console.error(xhr.responseText); // Log the error message to the console
-//       // Optionally, you can display an error message or perform other actions
-//     },
-//   });
-// });
-// });
 
 // Add multiple inputs dynamically
 $(document).ready(function () {
@@ -1202,10 +1114,6 @@ $(document).ready(function () {
     //Check maximum number of input fields
     if (x < maxField) {
       x++; //Increment field counter
-      // console.log($(this).parent())
-      // console.log($(this).parent().parent())
-      // console.log($(this).parent().parent().parent())
-      // console.log($(this).parent().parent().parent().parent()[0])
       $(this).parent().parent().parent().parent().append(fieldHTML);
 
       // $(wrapper).append(fieldHTML); //Add field html
@@ -1263,8 +1171,6 @@ $(document).ready(function () {
 
       setTimeout(function () {
         for (i = 0; i < c_loc_des.length; i++) {
-          console.log("drections renderer");
-          console.log($("#current_loc").val());
           showAlternativeRoutes(
             directionsService,
             directionsRenderer,
@@ -1282,7 +1188,6 @@ $(document).ready(function () {
 function fetchloadrows(query = [], tableIds = []) {
   for (var i = 0; i < query.length; i++) {
     (function (i) {
-      console.log("query", query[i]);
       $.ajax({
         url: "./components/load_data.php?" + query[i] + "=1",
         method: "POST", // Corrected typo here
@@ -1303,7 +1208,6 @@ function fetchloadrows(query = [], tableIds = []) {
 function fetchgdrows(query = [], tableIds = []) {
   for (var i = 0; i < query.length; i++) {
     (function (i) {
-      console.log("query", query[i]);
       $.ajax({
         url: "./components/gd_data.php?" + query[i] + "=1",
         method: "POST", // Corrected typo here

@@ -70,9 +70,7 @@ $result1 = $mysqli->query($query1);
     <?php $page_title = "GDs";
     include('header.php'); ?>
 
-    <!-- <div id="alertmsg_container">
-        <div id="alert_msg" class="alert_msg"><span class="close_alrt_msg">x</span></div>
-    </div> -->
+
     <div id="alert_msg" class="alert_msg"></div>
 
     <div class="loader" style="position: fixed;">
@@ -103,13 +101,7 @@ $result1 = $mysqli->query($query1);
 
             <div style="display: flex;justify-content: space-between;margin-right: 1.875rem;margin-bottom: 1.875rem;">
                 <input type="none " onkeyup="search()" style="width: 72%;margin-right: 1.25rem; display: none" type="search" name="search_loadBars" id="search_loadBars" placeholder="search...">
-                <!-- <select name="search_loadBars_filter" style="width: 20%;">
-                    <option value="load_num">Pro No.</option>
-                    <option value="truck_num">Truck No.</option>
-                    <option value="driver">Driver</option>
-                    <option value="driver">Remaning Distance</option>
-                    <option value="check_notes">Check Notes</option>
-                </select> -->
+
             </div>
             <div class="truckNumber" id="truckedit">
                 <div class="modal-content">
@@ -119,7 +111,7 @@ $result1 = $mysqli->query($query1);
                     </div>
 
                     <div class="modal-body">
-                        <form id="driver_info_form" method="POST" enctype="multipart/form-data">
+                        <form id="driver_info_form" method="POST" enctype="multipart/form-data" onsubmit="return submitFormWithRedirect(this);">
                             <input type="hidden" name="id" id="id">
 
                             <div class="row">
@@ -161,7 +153,7 @@ $result1 = $mysqli->query($query1);
 
                             <div class="formbuttons">
                                 <button type="reset" value="Cancel" name="reset" class="cancel">Reset</button>
-                                <button type="submit" value="Submit" name="payment" class="submit">+ Payment</button>
+                                <button type="submit" value="Submit" name="payment" class="submit1">+ Payment</button>
                                 <button type="submit" value="Submit" name="truckstate" class="submit">Submit</button>
 
                             </div>
@@ -359,7 +351,6 @@ $result1 = $mysqli->query($query1);
             var activeTab = sessionStorage.activeTab;
             $(".tab-content").fadeIn(1000);
             if (activeTab) {
-                console.log("active tab", activeTab)
                 $('.tab-content ' + activeTab).show().siblings().hide();
                 // also make sure you your active class to the corresponding tab menu here
                 $(".menu li a[href=" + "\"" + activeTab + "\"" + "]").parent().addClass('active').siblings(); // NaNpxoveClass('active');
@@ -377,7 +368,6 @@ $result1 = $mysqli->query($query1);
             // Enable, disable and switch tabs on click
             $('.navbar .menu li a').on('click', function(e) {
                 var currentAttrValue = $(this).attr('href');
-                console.log("currentAttrValue", currentAttrValue)
                 // Show/Hide Tabs
                 $('.tab-content ' + currentAttrValue).fadeIn(2000).siblings().hide();
                 sessionStorage.activeTab = currentAttrValue;
@@ -471,7 +461,6 @@ $result1 = $mysqli->query($query1);
                     if (!val) {
                         return false;
                     }
-                    // console.log(val)
                     currentFocus = -1;
                     /*create a DIV element that will contain the items (values):*/
                     a = document.createElement("DIV");
@@ -502,8 +491,9 @@ $result1 = $mysqli->query($query1);
                                         gd: val
                                     },
                                     success: function(response) {
+                                        $(".submit").prop("disabled", false).css('cursor', 'pointer')
+                                        $(".submit1").prop("disabled", false).css('cursor', 'pointer')
                                         var data = JSON.parse(response)
-                                        console.log(data)
                                         $("#gdno").val(data.GD_number)
                                         $("#amount_paid").val(data.PaidAmount)
                                         $("#total_amount").val(data.TotalAmount)
@@ -517,11 +507,11 @@ $result1 = $mysqli->query($query1);
                                     error: function(xhr, status, error) {
                                         // Handle errors here, if any
                                         console.error(xhr.responseText); // Log the error message to the console
+                                        $(".submit").prop("disabled", true).css('cursor', 'not-allowed');
+                                        $(".submit1").prop("disabled", true).css('cursor', 'not-allowed');
                                         // Optionally, you can display an error message or perform other actions
                                     }
                                 });
-
-                                console.log(val)
                                 /*close the list of autocompleted values,
                                 (or any other open lists of autocompleted values:*/
                                 closeAllLists();
@@ -586,7 +576,6 @@ $result1 = $mysqli->query($query1);
                 }
                 /*execute a function when someone clicks in the document:*/
                 document.addEventListener("click", function(e) {
-                    // console.log(e.target)
                     closeAllLists(e.target);
                 });
             }
@@ -594,14 +583,14 @@ $result1 = $mysqli->query($query1);
             autocomplete(document.getElementById("myInput"), data);
 
             $("#myInput").on("change", function(e) {
-                console.log($(this).val())
             })
 
         });
 
         $("#loadBoard1, #loadBoard2, #loadBoard3").on("click", ".driver_info_form", function(e) {
+            $(".submit").prop("disabled", false).css('cursor', 'pointer');
+            $(".submit1").prop("disabled", false).css('cursor', 'pointer');
             var loadID = $(this).data("load_id");
-            console.log("loadID index:", loadID)
             $.ajax({
                 type: "get", // or "GET" depending on your backend implementation
                 url: './Assets/backendfiles/gd_pay.php?gdrecord=' + loadID, // Replace 'your_php_script.php' with the path to your PHP script
@@ -609,9 +598,7 @@ $result1 = $mysqli->query($query1);
                     gd: loadID // Sending loadID as the 'record' parameter
                 },
                 success: function(response) {
-                    console.log("Response:", response)
                     var data = JSON.parse(response);
-                    console.log(data);
                     $("#gdno").val(data.GD_number);
                     $("#amount_paid").val(data.PaidAmount);
                     $("#total_amount").val(data.TotalAmount);
@@ -621,7 +608,9 @@ $result1 = $mysqli->query($query1);
                     // Handle the response here, if needed
                     // window.location.href = 'gd_payments.php';
                     // Optionally, you can display a success message or perform other actions
+
                 },
+
                 error: function(xhr, status, error) {
                     // Handle errors here, if any
                     console.error(xhr.responseText); // Log the error message to the console
@@ -636,28 +625,14 @@ $result1 = $mysqli->query($query1);
         function search() {
             var input, filter, ul, li, p, i, txtValue;
             input = document.getElementById('search_loadBars');
-            console.log("input", input)
             filter = input.value.toUpperCase();
-            console.log("filter", filter)
-
             getGds(filter);
-            console.log("getGds", getGds(filter))
-
             ul = document.getElementById("undelivered_load_bars");
-            console.log("ul", ul)
             li = ul.getElementsByClassName('undelivered_load_bars');
-            console.log("li", li)
-
             for (i = 0; i < li.length; i++) {
                 li[i].style.display = "block"; // Show all items initially
-                console.log("li", li[i])
+
             }
-
-
-
-
-
-
 
             try {
                 const response = $.ajax({
@@ -678,18 +653,25 @@ $result1 = $mysqli->query($query1);
                 event.preventDefault();
 
                 var formId = $('#id').val();
-                console.log("Form ID:", formId);
-
-
                 // Serialize the form data
                 var formData = $(this).serialize();
+
+                var form = document.getElementById('driver_info_form');
                 // Send the form data via AJAX
                 $.ajax({
                     type: 'POST',
                     url: './Assets/backendfiles/gd_pay.php?uid=' + formId, // Replace 'your_php_script.php' with the path to your PHP script
                     data: formData,
                     success: function(response) {
-                        // console.log("Response:", response)
+                        // Reset the form fields
+                        $('#gdbank').val('');
+                        $('#total_amount').val('');
+                        $('#status').val('opening'); // Reset select element to its default option
+                        // Optionally, you can also reset the hidden inputs
+                        $('#gdno').val('');
+                        $('#amount_paid').val('');
+                        // $("#driver_info_form").find("input[type=text], input[type=date], select").val("");
+
                         fetchloadrows(
                             ["opening", "posted", "bs_matched"],
                             ["table1", "table2", "table3"]
@@ -707,13 +689,47 @@ $result1 = $mysqli->query($query1);
 
         });
 
-        $(document).ready(function(){
-    $('.submit, .cancel').prop('disabled', true).css('cursor', 'not-allowed');
-    $('#gdno').keyup(function(){
-        var isEmpty = $(this).val().length === 0;
-        $('.submit, .cancel').prop('disabled', isEmpty).css('cursor', isEmpty ? 'not-allowed' : 'pointer');
-    });
-});
+
+        // Function to handle form submission
+        // Function to handle form submission
+        function submitFormWithRedirect(form) {
+            // Get the value of the id field
+            var idValue = $('#gdno').val();
+
+            // Check which button was clicked
+            if ($(document.activeElement).hasClass('submit1')) {
+                // Redirect to gd_payments.php with id value appended to the URL
+                window.location.href = 'gd_payments.php?id=' + idValue;
+
+                // Prevent the default form submission
+                return false;
+            } else {
+                // Allow the default form submission for other buttons
+                return true;
+            }
+        }
+
+        $(document).ready(function() {
+            // Disable submit button initially
+            $(".submit").prop("disabled", true).css('cursor', 'not-allowed');
+            $(".submit1").prop("disabled", true).css('cursor', 'not-allowed');
+
+            // Add event listener to form inputs
+            $(".form-control").on("input", function() {
+                var formHasValue = false;
+                // Check if any input field has a value
+                $(".form-control").each(function() {
+                    if ($(this).val().trim() !== "") {
+                        formHasValue = true;
+                        return false; // Exit the loop if any input field has a value
+                    }
+                });
+                // Enable or disable submit button based on formHasValue
+                $(".submit").prop("disabled", !formHasValue).css('cursor', formHasValue ? 'pointer' : 'not-allowed');
+                $(".submit1").prop("disabled", !formHasValue).css('cursor', formHasValue ? 'pointer' : 'not-allowed');
+            });
+
+        });
     </script>
 
 

@@ -14,6 +14,7 @@ $creater = $_SESSION['myid'];
 
 
 if (($_REQUEST['action_type'] == 'delete') && !empty($_GET['id'])) {
+    
     // Include your database connection here
 
     $id = $_GET['id'];
