@@ -10,7 +10,7 @@ $redirectURL = '../../index.php';
 $statusMsg = $errorMsg = '';
 $sessData = array();
 $statusType = 'danger';
-$creater = $_SESSION['myid'];
+// $creater = $_SESSION['myid'];
 
 
 if (($_REQUEST['action_type'] == 'delete') && !empty($_GET['id'])) {

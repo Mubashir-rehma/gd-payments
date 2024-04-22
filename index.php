@@ -604,7 +604,6 @@ $result1 = $mysqli->query($query1);
 
         $("#loadBoard1, #loadBoard2, #loadBoard3").on("click", ".driver_info_form", function(e) {
             var loadID = $(this).data("load_id");
-            console.log("loadID index:", loadID)
             $.ajax({
                 type: "get", // or "GET" depending on your backend implementation
                 url: './Assets/backendfiles/gd_pay.php?gdrecord=' + loadID, // Replace 'your_php_script.php' with the path to your PHP script

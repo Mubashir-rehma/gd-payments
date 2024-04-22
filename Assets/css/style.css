@@ -1160,7 +1160,7 @@ textarea {
 .modal-content {
     background-color: var(--container);
     border: 1px solid #888;
-    width: 71%;
+    /* width: 71%; */
     border-radius: 10px;
     margin-bottom: 50px;
 }

@@ -1292,7 +1292,12 @@ function fetchloadrows(query = [], tableIds = []) {
             .destroy();
           $("#" + tableIds[i] + " > tbody").html(data);
           $("#" + tableIds[i])
-            .DataTable()
+            .DataTable({
+              dom: 'Bfrtip',
+              buttons: [
+                  'copy', 'excel', 'pdf', 'csv'
+              ]
+          } )
             .draw();
         },
       });
@@ -1308,13 +1313,39 @@ function fetchgdrows(query = [], tableIds = []) {
         url: "./components/gd_data.php?" + query[i] + "=1",
         method: "POST", // Corrected typo here
         success: function (data) {
-          $("#" + tableIds[i])
-            .DataTable()
-            .destroy();
+          // Update the table content
           $("#" + tableIds[i] + " > tbody").html(data);
-          $("#" + tableIds[i])
-            .DataTable()
-            .draw();
+
+          // Check if DataTable already exists, if yes, destroy it
+          if ($.fn.DataTable.isDataTable("#" + tableIds[i])) {
+            $("#" + tableIds[i]).DataTable().destroy();
+          }
+
+          // Initialize DataTable with buttons
+          $("#" + tableIds[i]).DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+              'copy', 'excel', 'pdf', 'csv'
+            ]
+          });
+
+          // $("#" + tableIds[i])
+          //   .DataTable()
+          //   .destroy();
+          // $("#" + tableIds[i] + " > tbody").html(data);
+          // $("#" + tableIds[i])
+          //   .DataTable({
+          //     dom: 'Bfrtip',
+          //     buttons: [
+          //         'copy', 'excel', 'pdf', 'csv'
+          //     ]
+          // } )
+          //   .draw({
+          //     dom: 'Bfrtip',
+          //     buttons: [
+          //         'copy', 'excel', 'pdf', 'csv'
+          //     ]
+          // } );
         },
       });
     })(i);
